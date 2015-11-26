@@ -1,6 +1,0 @@
-﻿namespace DAO
-{
-    interface BitcoinDAO
-    {
-    }
-}

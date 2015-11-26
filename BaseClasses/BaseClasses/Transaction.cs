@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DAO;
+using System.Collections.Generic;
 
 namespace Bitcoin
 {
@@ -6,9 +7,15 @@ namespace Bitcoin
     {
         public string ID;
         public bool Coinbase;
+        private BitcoinDAO dao;
 
-        public List<Output> Inputs;
-        public List<Output> Outputs;
+        public Transaction(string id, bool coinbase, BitcoinDAO dao)
+        {
+            ID = id; Coinbase = coinbase; this.dao = dao;
+        }
+
+        public List<Output> Inputs = new List<Output>();
+        public List<Output> Outputs = new List<Output>();
         public Block Block;
     }
 }

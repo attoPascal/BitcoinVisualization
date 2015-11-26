@@ -1,11 +1,19 @@
-﻿namespace Bitcoin
+﻿using DAO;
+using System.Collections.Generic;
+
+namespace Bitcoin
 {
-    [FileHelpers.DelimitedRecord(",")]
     public class Address
     {
-        public string ID;
+        public Address(string id, BitcoinDAO dao)
+        {
+            ID = id;
+            this.dao = dao;
+        }
 
-        [FileHelpers.FieldHidden]
-        public Output Output;
+        public string ID;
+        private BitcoinDAO dao;
+
+        public List<Output> Outputs = new List<Output>();
     }
 }

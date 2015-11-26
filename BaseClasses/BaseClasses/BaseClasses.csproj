@@ -50,9 +50,10 @@
     <Compile Include="Address.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="Blockchain.cs" />
-    <Compile Include="Interface1.cs" />
+    <Compile Include="BitcoinDAO.cs" />
+    <Compile Include="CSVDAO.cs" />
     <Compile Include="Output.cs" />
-    <Compile Include="Test1.cs" />
+    <Compile Include="Tests.cs" />
     <Compile Include="Transaction.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
