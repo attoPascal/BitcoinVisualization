@@ -1,5 +1,6 @@
 ﻿using DAO;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bitcoin
 {
@@ -12,8 +13,38 @@ namespace Bitcoin
         }
 
         public string ID;
+
         private BitcoinDAO dao;
 
-        public List<Output> Outputs = new List<Output>();
+        public List<string> OutputIDs = new List<string>();
+        private List<Output> outputs = null;
+        public List<Output> Outputs
+        {
+            get
+            {
+                if (outputs == null)
+                {
+                    outputs = OutputIDs.Select(id => dao.OutputWithID(id)).ToList();
+                }
+                return outputs;
+            }
+        }
+
+        public Transaction FirstTransaction
+        {
+            get
+            {
+                var firstTx = Outputs.First().Transaction;
+                foreach (var output in Outputs)
+                {
+                    var tx = output.Transaction;
+                    if (tx.Block.Height < firstTx.Block.Height)
+                    {
+                        firstTx = tx;
+                    }
+                }
+                return firstTx;
+            }
+        }
     }
 }

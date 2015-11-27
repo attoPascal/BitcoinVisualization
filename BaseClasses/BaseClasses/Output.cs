@@ -15,7 +15,32 @@ namespace Bitcoin
             ID = id; N = n; Value = value; Type = type; this.dao = dao;
         }
 
-        public Address Address;
-        public Transaction Transaction;
+        public string AddressID;
+        private Address address = null;
+        public Address Address
+        {
+            get
+            {
+                if (address == null)
+                {
+                    address = dao.AddressWithID(AddressID);
+                }
+                return address;
+            }
+        }
+
+        public string TransactionID;
+        private Transaction transaction = null;
+        public Transaction Transaction
+        {
+            get
+            {
+                if (transaction == null)
+                {
+                    transaction = dao.TransactionWithID(TransactionID);
+                }
+                return transaction;
+            }
+        }
     }
 }

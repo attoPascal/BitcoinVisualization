@@ -22,17 +22,12 @@ namespace DAO
             initializeTransactionInputRelations();
             initializeTransactionOutputRelations();
             initializeBlockTransactionRelations();
-            setRelations();
         }
 
         private Dictionary<string, Address> addresses;
         private Dictionary<string, Output> outputs;
         private Dictionary<string, Transaction> transactions;
         private Dictionary<string, Block> blocks;
-        private List<Tuple<string, string>> outputAddressRelations;
-        private List<Tuple<string, string>> transactionOutputRelations;
-        private List<Tuple<string, string>> transactionInputRelations;
-        private List<Tuple<string, string>> blockTransactionRelations;
 
         public List<Address> Addresses
         {
@@ -165,8 +160,6 @@ namespace DAO
 
         private void initializeOutputAddressRelations()
         {
-            outputAddressRelations = new List<Tuple<string, string>>();
-
             var fileName = "rel_output_address.csv";
             var lines = File.ReadAllLines(dataPath + fileName);
 
@@ -177,14 +170,13 @@ namespace DAO
                 var outputID = fields[0];
                 var addressID = fields[1];
 
-                outputAddressRelations.Add(new Tuple<string, string>(outputID, addressID));
+                OutputWithID(outputID).AddressID = addressID;
+                AddressWithID(addressID).OutputIDs.Add(outputID);
             }
         }
 
         private void initializeTransactionInputRelations()
         {
-            transactionInputRelations = new List<Tuple<string, string>>();
-
             var fileName = "rel_input.csv";
             var lines = File.ReadAllLines(dataPath + fileName);
 
@@ -195,14 +187,13 @@ namespace DAO
                 var transactionID = fields[0];
                 var inputID = fields[1];
 
-                transactionInputRelations.Add(new Tuple<string, string>(transactionID, inputID));
+                TransactionWithID(transactionID).InputIDs.Add(inputID);
+                OutputWithID(inputID).TransactionID = transactionID;
             }
         }
 
         private void initializeTransactionOutputRelations()
         {
-            transactionOutputRelations = new List<Tuple<string, string>>();
-
             var fileName = "rel_tx_output.csv";
             var lines = File.ReadAllLines(dataPath + fileName);
 
@@ -213,14 +204,13 @@ namespace DAO
                 var transactionID = fields[0];
                 var outputID = fields[1];
 
-                transactionOutputRelations.Add(new Tuple<string, string>(transactionID, outputID));
+                TransactionWithID(transactionID).OutputIDs.Add(outputID);
+                OutputWithID(outputID).TransactionID = transactionID;
             }
         }
 
         private void initializeBlockTransactionRelations()
         {
-            blockTransactionRelations = new List<Tuple<string, string>>();
-
             var fileName = "rel_block_tx.csv";
             var lines = File.ReadAllLines(dataPath + fileName);
 
@@ -231,49 +221,9 @@ namespace DAO
                 var blockID = fields[0];
                 var transactionID = fields[1];
 
-                blockTransactionRelations.Add(new Tuple<string, string>(blockID, transactionID));
+                BlockWithID(blockID).TransactionIDs.Add(transactionID);
+                TransactionWithID(transactionID).BlockID = blockID;
             }
         }
-
-        private void setRelations()
-        {
-            foreach (var relation in outputAddressRelations)
-            {
-                var output = OutputWithID(relation.Item1);
-                var address = AddressWithID(relation.Item2);
-
-                output.Address = address;
-                address.Outputs.Add(output);
-            }
-
-            foreach (var relation in transactionInputRelations)
-            {
-                var transaction = TransactionWithID(relation.Item1);
-                var input = OutputWithID(relation.Item2); // inputs are modelled as outputs
-
-                transaction.Inputs.Add(input);
-                input.Transaction = transaction;
-            }
-
-            foreach (var relation in transactionOutputRelations)
-            {
-                var transaction = TransactionWithID(relation.Item1);
-                var output = OutputWithID(relation.Item2);
-
-                transaction.Outputs.Add(output);
-                output.Transaction = transaction;
-            }
-
-            foreach (var relation in blockTransactionRelations)
-            {
-                var block = BlockWithID(relation.Item1);
-                var transaction = TransactionWithID(relation.Item2);
-
-                block.Transactions.Add(transaction);
-                transaction.Block = block;
-            }
-        }
-
-
     }
 }
