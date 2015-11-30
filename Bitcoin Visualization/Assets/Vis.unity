@@ -111,7 +111,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1317219921}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adc2a9344d0cfb54fbbfdb39cab2b705, type: 3}
+  m_Script: {fileID: 11500000, guid: 222651d5141d57049b55d962f1b81ef0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!199 &1317219923
@@ -1289,6 +1289,7 @@ GameObject:
   - 92: {fileID: 1782894337}
   - 124: {fileID: 1782894336}
   - 81: {fileID: 1782894335}
+  - 114: {fileID: 1782894340}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1325,8 +1326,8 @@ Camera:
   m_GameObject: {fileID: 1782894334}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -1363,3 +1364,14 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!114 &1782894340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1782894334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f83dfcea0e24c624992df2ffa808b39b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
