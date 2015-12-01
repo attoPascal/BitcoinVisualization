@@ -111,7 +111,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1317219921}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 222651d5141d57049b55d962f1b81ef0, type: 3}
+  m_Script: {fileID: 11500000, guid: adc2a9344d0cfb54fbbfdb39cab2b705, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!199 &1317219923
@@ -132,9 +132,7 @@ ParticleSystemRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_MinimumChartSize: 4
   m_AutoUVMaxDistance: .5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
