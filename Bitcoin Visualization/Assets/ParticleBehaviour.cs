@@ -9,22 +9,26 @@ public class ParticleBehaviour : MonoBehaviour {
 
 	string dataPath = "";
 	BitcoinDAO input;
-	
 	int numPlanets;
+
+	private float expansionIncrement;
+	
 	private ParticleSystem.Particle[] planets;
 	private Vector3[] inArray;
 	bool fullyExpanded = false;
 	private Vector3[]  currentExpansion;
+
+
 	// Use this for initialization
 	void Start () {
+		numPlanets = 1000;
+		expansionIncrement = 80f / (numPlanets - 1);
 		if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
 			dataPath = @"../data/1000blocks/";
 		} else if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor) {
 			dataPath = @"..\data\1000blocks\";
-
 		}
 		input = new CSVDAO(dataPath);
-		numPlanets = 100;
 		//Debug.Log(System.Environment.CurrentDirectory);
 		planets = new ParticleSystem.Particle[numPlanets];
 		InitInArray();
@@ -33,18 +37,19 @@ public class ParticleBehaviour : MonoBehaviour {
 			float x = i * increment;
 			//planets[i].position = PolarToCartesian(inArray[i]);
 			planets[i].color = new Color(Random.Range (0f, 1f), Random.Range (0f, 1f),Random.Range (0f, 1f));
-			planets[i].size = (float)input.Addresses[i].FirstTransaction.Outputs[0].Value/25;
+			planets[i].size = (float)input.Addresses[i].FirstTransaction.Outputs[0].Value/100;
 		}
 	}
 	void expand(){
-		float increment = 1f / (numPlanets - 1);
-		fullyExpanded = true;
+		expansionIncrement = expansionIncrement * 0.97f;
 		for (int i = 0; i<numPlanets; i++) {
-			if(currentExpansion[i].x < inArray[i].x){
-				currentExpansion[i].x = currentExpansion[i].x + increment;
+		fullyExpanded = true;	
+		if(currentExpansion[i].x < inArray[i].x){
+				currentExpansion[i].x = currentExpansion[i].x + expansionIncrement;
 				planets[i].position = PolarToCartesian(currentExpansion[i]);
 				fullyExpanded = false;
 			}
+
 		}
 		
 	}
