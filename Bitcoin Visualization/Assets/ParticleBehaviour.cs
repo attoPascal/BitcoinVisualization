@@ -6,7 +6,8 @@ using System.IO;
 
 public class ParticleBehaviour : MonoBehaviour {
 
-	string dataPath = @"..\data\1000blocks\";
+
+	string dataPath = "";
 	BitcoinDAO input;
 	
 	int numPlanets;
@@ -16,6 +17,12 @@ public class ParticleBehaviour : MonoBehaviour {
 	private Vector3[]  currentExpansion;
 	// Use this for initialization
 	void Start () {
+		if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
+			dataPath = @"../data/1000blocks/";
+		} else if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor) {
+			dataPath = @"..\data\1000blocks\";
+
+		}
 		input = new CSVDAO(dataPath);
 		numPlanets = 100;
 		//Debug.Log(System.Environment.CurrentDirectory);
@@ -46,7 +53,7 @@ public class ParticleBehaviour : MonoBehaviour {
 		if (!fullyExpanded) {
 			expand ();
 		}
-		GetComponent<ParticleSystem> ().SetParticles (planets, planets.Length);
+		GetComponent<ParticleSystem>().SetParticles (planets, planets.Length);
 		
 	}
 	//
