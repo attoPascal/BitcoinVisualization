@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Bitcoin;
 using System.Linq;
 using System.IO;
@@ -7,7 +6,7 @@ using System.Globalization;
 
 namespace DAO
 {
-    public class CSVDAO : BitcoinDAO
+    public class CSVDAO
     {
         private string dataPath;
 
@@ -24,12 +23,12 @@ namespace DAO
             initializeBlockTransactionRelations();
         }
 
-        private Dictionary<string, Address> addresses;
-        private Dictionary<string, Output> outputs;
-        private Dictionary<string, Transaction> transactions;
-        private Dictionary<string, Block> blocks;
+        private Dictionary<string, CSVAddress> addresses;
+        private Dictionary<string, CSVOutput> outputs;
+        private Dictionary<string, CSVTransaction> transactions;
+        private Dictionary<string, CSVBlock> blocks;
 
-        public List<Address> Addresses
+        public List<CSVAddress> Addresses
         {
             get
             {
@@ -37,8 +36,8 @@ namespace DAO
             }
         }
 
-        
-        public List<Output> Outputs
+
+        public List<CSVOutput> Outputs
         {
             get
             {
@@ -46,7 +45,7 @@ namespace DAO
             }
         }
 
-        public List<Transaction> Transactions
+        public List<CSVTransaction> Transactions
         {
             get
             {
@@ -54,7 +53,7 @@ namespace DAO
             }
         }
 
-        public List<Block> Blocks
+        public List<CSVBlock> Blocks
         {
             get
             {
@@ -62,34 +61,34 @@ namespace DAO
             }
         }
 
-        public Address AddressWithID(string id)
+        public CSVAddress AddressWithID(string id)
         {
             return addresses[id];
         }
 
-        public Output OutputWithID(string id)
+        public CSVOutput OutputWithID(string id)
         {
             return outputs[id];
         }
 
-        public Transaction TransactionWithID(string id)
+        public CSVTransaction TransactionWithID(string id)
         {
             return transactions[id];
         }
 
-        public Block BlockWithID(string id)
+        public CSVBlock BlockWithID(string id)
         {
             return blocks[id];
         }
 
-        public Block BlockWithHeight(int height)
+        public CSVBlock BlockWithHeight(int height)
         {
             return Blocks.ElementAt(height);
         }
 
         private void initializeOutputs()
         {
-            outputs = new Dictionary<string, Output>();
+            outputs = new Dictionary<string, CSVOutput>();
 
             var fileName = "outputs.csv";
             var lines = File.ReadAllLines(dataPath + fileName);
@@ -103,13 +102,13 @@ namespace DAO
                 var value = double.Parse(fields[2], CultureInfo.InvariantCulture);
                 var type = fields[3];
 
-                outputs.Add(id, new Output(id, n, value, type, dao: this));
+                outputs.Add(id, new CSVOutput(id, n, value, type, dao: this));
             }
         }
 
         private void initializeAddresses()
         {
-            addresses = new Dictionary<string, Address>();
+            addresses = new Dictionary<string, CSVAddress>();
 
             var fileName = "addresses.csv";
             var lines = File.ReadAllLines(dataPath + fileName);
@@ -117,13 +116,13 @@ namespace DAO
             foreach (string line in lines)
             {
                 var outputID = line;
-                addresses.Add(outputID, new Address(outputID, dao: this));
+                addresses.Add(outputID, new CSVAddress(outputID, dao: this));
             }
         }
 
         private void initializeTransactions()
         {
-            transactions = new Dictionary<string, Transaction>();
+            transactions = new Dictionary<string, CSVTransaction>();
 
             var fileName = "transactions.csv";
             var lines = File.ReadAllLines(dataPath + fileName);
@@ -135,13 +134,13 @@ namespace DAO
                 var id = fields[0];
                 var coinbase = fields[1] == "True";
 
-                transactions.Add(id, new Transaction(id, coinbase, dao: this));
+                transactions.Add(id, new CSVTransaction(id, coinbase, dao: this));
             }
         }
 
         private void initializeBlocks()
         {
-            blocks = new Dictionary<string, Block>();
+            blocks = new Dictionary<string, CSVBlock>();
 
             var fileName = "blocks.csv";
             var lines = File.ReadAllLines(dataPath + fileName);
@@ -154,7 +153,7 @@ namespace DAO
                 var height = int.Parse(fields[1]);
                 var timestamp = int.Parse(fields[2]);
 
-                blocks.Add(id, new Block(id, height, timestamp, dao: this));
+                blocks.Add(id, new CSVBlock(id, height, timestamp, dao: this));
             }
         }
 
