@@ -1,33 +1,27 @@
-﻿using DAO;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Data.Linq;
+using System.Data.Linq.Mapping;
 
 namespace Bitcoin
 {
+    [Table]
     public class Block
     {
+        [Column(IsPrimaryKey = true)]
         public string ID;
+
+        [Column]
         public int Height;
+
+        [Column]
         public int Timestamp;
-        private BitcoinDAO dao;
 
-        public Block(string id, int height, int timestamp, BitcoinDAO dao)
-        {
-            ID = id; Height = height; Timestamp = timestamp; this.dao = dao;
-        }
+        private EntitySet<Transaction> transactions;
 
-        public List<string> TransactionIDs = new List<string>();
-        private List<Transaction> transactions = null;
-        public List<Transaction> Transactions
+        [Association(Storage = "transactions", OtherKey = "BlockID")]
+        public EntitySet<Transaction> Transactions
         {
-            get
-            {
-                if (transactions == null)
-                {
-                    transactions = TransactionIDs.Select(id => dao.TransactionWithID(id)).ToList();
-                }
-                return transactions;
-            }
+            get { return transactions; }
+            set { transactions.Assign(value); }
         }
     }
 }

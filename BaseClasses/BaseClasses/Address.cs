@@ -1,39 +1,29 @@
-﻿using DAO;
-using System.Collections.Generic;
+﻿using System.Data.Linq;
+using System.Data.Linq.Mapping;
 using System.Linq;
 
 namespace Bitcoin
 {
+    [Table]
     public class Address
     {
-        public Address(string id, BitcoinDAO dao)
-        {
-            ID = id;
-            this.dao = dao;
-        }
-
+        [Column(IsPrimaryKey = true)]
         public string ID;
 
-        private BitcoinDAO dao;
+        private EntitySet<Output> outputs;
 
-        public List<string> OutputIDs = new List<string>();
-        private List<Output> outputs = null;
-        public List<Output> Outputs
+        [Association(Storage = "outputs", OtherKey = "AddressID")]
+        public EntitySet<Output> Outputs
         {
-            get
-            {
-                if (outputs == null)
-                {
-                    outputs = OutputIDs.Select(id => dao.OutputWithID(id)).ToList();
-                }
-                return outputs;
-            }
+            get { return outputs; }
+            set { outputs.Assign(value); }
         }
 
         public Transaction FirstTransaction
         {
             get
             {
+                // TODO: linq
                 var firstTx = Outputs.First().Transaction;
                 foreach (var output in Outputs)
                 {
@@ -44,6 +34,20 @@ namespace Bitcoin
                     }
                 }
                 return firstTx;
+            }
+        }
+
+        public double Balance
+        {
+            get
+            {
+                // TODO: correct implementation
+                var balance = 0.0;
+                foreach (var output in Outputs)
+                {
+                    balance += output.Value;
+                }
+                return balance;
             }
         }
     }
