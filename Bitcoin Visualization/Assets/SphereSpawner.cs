@@ -41,7 +41,11 @@ public class SphereSpawner : MonoBehaviour {
 			//planet.GetComponent<Renderer> ().material.color = new Color(Random.Range(0f,1f),Random.Range(0f,1f),Random.Range(0f,1f));
 			planet.GetComponent<Renderer> ().material.color = UnityEditor.EditorGUIUtility.HSVToRGB(Random.Range(0f, 1f), 1f, 1f);
 			planet.AddComponent<OnClickCenterView>();
-		//	planet.GetComponent<Renderer>.material.setColor();
+			planet.GetComponent<OnClickCenterView>().setAddress(input.Addresses[i].ID);
+			planet.GetComponent<OnClickCenterView>().setBlock(input.Addresses[i].FirstTransaction.Block.Height);
+			planet.GetComponent<OnClickCenterView>().setBalance((float)input.Addresses[i].FirstTransaction.Outputs[0].Value);
+
+			//	planet.GetComponent<Renderer>.material.setColor();
 			planet.transform.localScale += scaleVector;
 			planet.transform.position = positions[i];
 			planets.Add(planet);
