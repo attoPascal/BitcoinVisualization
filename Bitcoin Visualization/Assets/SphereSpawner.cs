@@ -38,6 +38,8 @@ public class SphereSpawner : MonoBehaviour {
 			//Debug.Log(i);
 
 			planet = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+			//planet.GetComponent<Renderer> ().material.color = new Color(Random.Range(0f,1f),Random.Range(0f,1f),Random.Range(0f,1f));
+			planet.GetComponent<Renderer> ().material.color = UnityEditor.EditorGUIUtility.HSVToRGB(Random.Range(0f, 1f), 1f, 1f);
 			planet.AddComponent<OnClickCenterView>();
 		//	planet.GetComponent<Renderer>.material.setColor();
 			planet.transform.localScale += scaleVector;
@@ -52,7 +54,7 @@ public class SphereSpawner : MonoBehaviour {
 		float twoPi = Mathf.PI * 2;
 		positions = new Vector3[numPlanets];
 		for (int i = 0; i < positions.Length; i++) {
-			positions[i]= PolarToCartesian(new Vector3(input.Addresses[i].FirstTransaction.Block.Height/10, Random.Range(0f, twoPi), Random.Range(0f, twoPi)));
+			positions[i]= PolarToCartesian(new Vector3(input.Addresses[i].FirstTransaction.Block.Height/2, Random.Range(0f, twoPi), Random.Range(0f, twoPi)));
 		}
 		Debug.Log("positions acquired: "+positions.Length);
 	}
