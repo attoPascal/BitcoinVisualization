@@ -38,7 +38,8 @@ public class SphereSpawner : MonoBehaviour {
 			//Debug.Log(i);
 
 			planet = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-
+			planet.AddComponent<OnClickCenterView>();
+		//	planet.GetComponent<Renderer>.material.setColor();
 			planet.transform.localScale += scaleVector;
 			planet.transform.position = positions[i];
 			planets.Add(planet);
@@ -69,5 +70,13 @@ public class SphereSpawner : MonoBehaviour {
 		
 		
 		return new Vector3(vX, vY, vZ);
+	}
+
+	public void CenterView(Vector3 newCenter){
+		for (int i = 0; i < numPlanets; i++) {
+			GameObject temp = (GameObject) planets [i];
+			temp.transform.position += new Vector3 (-newCenter.x, -newCenter.y, -newCenter.z);
+			planets [i] = temp;
+		}
 	}
 }
