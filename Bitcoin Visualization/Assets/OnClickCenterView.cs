@@ -46,7 +46,21 @@ public class OnClickCenterView : MonoBehaviour {
 	}
 	void OnGUI(){
 		if (_guiOn) {
-			GUI.Box (new Rect (Input.mousePosition.x+20, Screen.height-Input.mousePosition.y, 350, 50), infos);
+			float boxX=0f;
+			float boxY=0f;
+			if(Input.mousePosition.x+370<Screen.width){
+				boxX=Input.mousePosition.x+20;
+			}
+			else{
+				boxX = Input.mousePosition.x-370;
+			}
+			if(Screen.height-Input.mousePosition.y+50>Screen.height){
+				boxY=Screen.height - Input.mousePosition.y-50;
+			}
+			else{
+				boxY = Screen.height-Input.mousePosition.y;
+			}
+			GUI.Box (new Rect (boxX, boxY, 350, 50), infos);
 		}
 	}
 }
