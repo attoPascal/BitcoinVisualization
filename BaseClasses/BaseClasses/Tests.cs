@@ -1,5 +1,4 @@
-﻿using Bitcoin;
-using DAO;
+﻿using DAO;
 using System.IO;
 
 namespace Tests
@@ -8,51 +7,46 @@ namespace Tests
     {
         static void Main()
         {
-            var dataPath = @"..\..\..\..\data\1000blocks\";
-            //var dataPath = @"..\..\..\..\..\blocks_1_180000\";
-            BitcoinDAO dao = new CSVDAO(dataPath);
+            var dataPath = @"..\..\..\..\data\1000blocks.db";
+            BitcoinDAO dao = new SQLiteDAO(dataPath);
 
-            Test1(dao);
-            Test2(dao: dao, outputStream: new FileStream(@"..\..\..\..\output\out.txt", FileMode.Create));
+            testIteration(dao);
+            //testAssociations(dao: dao, outputStream: new FileStream(@"..\..\..\..\output\out.txt", FileMode.Create));
 
         }
 
-        static void Test1(BitcoinDAO dao)
+        static void testIteration(BitcoinDAO dao)
         {
-            var addresses = dao.Addresses;
+            var i = 0;
+
             System.Diagnostics.Debug.WriteLine("Addresses:");
-            for (int i = 0; i < 100; i++)
+
+            foreach (var address in dao.Addresses)
             {
-                Address address = addresses[i];
-                System.Diagnostics.Debug.WriteLine(address.ID);
+                System.Diagnostics.Debug.WriteLine($"{i++}: {address.ID}. 1st Block: {address.FirstTransaction.Block.Height}");
             }
 
-            var outputs = dao.Outputs;
-            System.Diagnostics.Debug.WriteLine("Outputs:");
-            for (int i = 0; i < 100; i++)
-            {
-                Output output = outputs[i];
-                System.Diagnostics.Debug.WriteLine($"{output.ID} ({output.Value} -> {output.Address.ID})");
-            }
+            //i = 0;
+            //System.Diagnostics.Debug.WriteLine("Outputs:");
+            //foreach (var output in dao.Outputs)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"{i++}: {output.Value} BTC");
+            //}
 
-            var transactions = dao.Transactions;
-            System.Diagnostics.Debug.WriteLine("Transaction:");
-            for (int i = 0; i < 100; i++)
-            {
-                Transaction tx = transactions[i];
-                System.Diagnostics.Debug.WriteLine($"{tx.ID}: {tx.Inputs.Count} inputs, {tx.Outputs.Count} outputs" + (tx.Coinbase ? " (coinbase)" : ""));
-            }
+            //System.Diagnostics.Debug.WriteLine("Transactions:");
+            //foreach (var tx in dao.Transactions)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"{tx.ID}: " + (tx.Coinbase ? " (coinbase)" : ""));
+            //}
 
-            var blocks = dao.Blocks;
-            System.Diagnostics.Debug.WriteLine("Blocks:");
-            for (int i = 0; i < 100; i++)
-            {
-                Block block = blocks[i];
-                System.Diagnostics.Debug.WriteLine($"Block {block.Height}: {block.ID}, {block.Transactions.Count} txs");
-            }
+            //System.Diagnostics.Debug.WriteLine("Blocks:");
+            //foreach (var block in dao.Blocks)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"Block {block.Height}: {block.ID}, {block.Transactions.Count} txs");
+            //}
         }
 
-        static void Test2(BitcoinDAO dao, Stream outputStream)
+        static void testAssociations(BitcoinDAO dao, Stream outputStream)
         {
             using (var writer = new StreamWriter(outputStream))
             {
@@ -78,7 +72,49 @@ namespace Tests
                 }
             }
         }
+
+        //private void testDB1()
+        //{
+        //    dbConnection.Open();
+        //    var command = new SQLiteCommand(dbConnection);
+        //    command.CommandText = "SELECT * FROM output";
+
+        //    System.Diagnostics.Debug.WriteLine("yoooo");
+
+        //    var reader = command.ExecuteReader();
+        //    while (reader.Read())
+        //    {
+        //        System.Diagnostics.Debug.WriteLine($"{reader["output_id"]} {reader["value"]}");
+        //    }
+        //    reader.Close();
+
+        //    dbConnection.Close();
+        //    dbConnection.Dispose();
+
+        //}
+
+        //private void testDB2()
+        //{
+        //    var context = new DataContext(dbConnection);
+        //    var outputs = from output in context.GetTable<Output>() select output;
+
+        //    foreach (var o in outputs)
+        //    {
+        //        System.Diagnostics.Debug.WriteLine($"{o.ID} {o.Value} ");
+        //        var tx = o.Transaction?.Coinbase;
+        //        //if (tx == null)
+        //        //    System.Diagnostics.Debug.WriteLine($" null");
+        //        //else
+        //        //    System.Diagnostics.Debug.WriteLine($" yui");
+        //    }
+
+        //    //var txs = context.GetTable<Transaction>();
+        //    //foreach (var tx in txs)
+        //    //{
+        //    //    System.Diagnostics.Debug.WriteLine($"{tx.TransactionID} {tx.Coinbase}");
+        //    //}
+        //}
     }
 
-    
+
 }
