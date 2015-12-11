@@ -97,7 +97,7 @@ public class OnClickCenterView : MonoBehaviour {
 		if(h<0){
 			h+=360;
 		}
-		Debug.Log ("hue: "+h + "saturation: "+s+"value: "+v);
+		//Debug.Log ("hue: "+h + "saturation: "+s+"value: "+v);
 		return new Vector3 (h/360, s, v);
 
 	}
