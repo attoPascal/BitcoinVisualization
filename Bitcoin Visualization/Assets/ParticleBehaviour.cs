@@ -37,11 +37,12 @@ public class ParticleBehaviour : MonoBehaviour {
 			float x = i * increment;
 			//planets[i].position = PolarToCartesian(inArray[i]);
 			planets[i].color = new Color(Random.Range (0f, 1f), Random.Range (0f, 1f),Random.Range (0f, 1f));
-			planets[i].size = (float)input.Addresses[i].FirstTransaction.Outputs[0].Value/100;
+			planets[i].size = (float)input.Addresses[i].FirstTransaction.Outputs[0].Value/50;
 		}
 	}
 	void expand(){
 		expansionIncrement = expansionIncrement * 0.97f;
+		expansionIncrement = 2.5f;
 		for (int i = 0; i<numPlanets; i++) {
 		fullyExpanded = true;	
 		if(currentExpansion[i].x < inArray[i].x){
@@ -66,7 +67,7 @@ public class ParticleBehaviour : MonoBehaviour {
 		inArray = new Vector3[numPlanets];
 		float twoPi = Mathf.PI * 2;
 		for (int i = 0;i<inArray.Length; i++) {
-			inArray[i]= new Vector3(input.Addresses[i].FirstTransaction.Block.Height/100, Random.Range(0f, twoPi), Random.Range(0f, twoPi));
+			inArray[i]= new Vector3(input.Addresses[i].FirstTransaction.Block.Height/10, Random.Range(0f, twoPi), Random.Range(0f, twoPi));
 		}
 		currentExpansion = new Vector3[numPlanets];
 		for (int i= 0; i<currentExpansion.Length; i++) {
