@@ -12,6 +12,8 @@ public class OnClickCenterView : MonoBehaviour {
 	public string infos = "";
 	private bool _guiOn = false;
 
+	private Vector3 targetPosition;
+
 	public void setAddress(string address){
 		this.address = address;
 	}
@@ -23,6 +25,12 @@ public class OnClickCenterView : MonoBehaviour {
 	}
 	public string getInfos(){
 		return infos;
+	}
+	public void setTargetPosition(Vector3 newTarget){
+		targetPosition = newTarget;
+	}
+	public Vector3 getTargetPosition(){
+		return targetPosition;
 	}
 
 	void OnMouseDown(){

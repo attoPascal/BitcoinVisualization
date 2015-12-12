@@ -14,6 +14,9 @@ public class SphereSpawner : MonoBehaviour {
 	
 	private ArrayList planets;
 	private Vector3[] positions;
+	private bool flight=false;
+	private Vector3 newCenter;
+	private float speed=25;
 
 	// Use this for initialization
 	void Start () {
@@ -26,7 +29,8 @@ public class SphereSpawner : MonoBehaviour {
 		input = new CSVDAO(dataPath);
 		//Debug.Log(System.Environment.CurrentDirectory);
 		numPlanets = 1000;
-		planets = new ArrayList(); 
+		planets = new ArrayList();
+		newCenter = new Vector3 (0, 0, 0);
 		InitArray();
 
 		GameObject planet;
@@ -66,7 +70,18 @@ public class SphereSpawner : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-	
+		if (flight) {
+			float step = speed * Time.deltaTime;
+			foreach (GameObject go in planets) {
+				OnClickCenterView other = go.GetComponent ("OnClickCenterView") as OnClickCenterView;
+				go.transform.position = Vector3.MoveTowards (go.transform.position, other.getTargetPosition (), step);
+			}
+			OnClickCenterView posCheck = ((GameObject)planets [0]).GetComponent ("OnClickCenterView") as OnClickCenterView;
+			if (((GameObject)planets [0]).transform.position == posCheck.getTargetPosition ()) {
+				flight = false;
+			}
+			//Debug.Log ("flying: "+flight);
+		}
 	}
 
 	public Vector3 PolarToCartesian(Vector3 inPolar){
@@ -79,11 +94,16 @@ public class SphereSpawner : MonoBehaviour {
 	}
 
 	public void CenterView(Vector3 newCenter){
+		this.newCenter = newCenter;
 		for (int i = 0; i < numPlanets; i++) {
 			GameObject temp = (GameObject) planets [i];
-			temp.transform.position += new Vector3 (-newCenter.x, -newCenter.y, -newCenter.z);
-			planets [i] = temp;
+			//temp.transform.position += new Vector3 (-newCenter.x, -newCenter.y, -newCenter.z);
+			//planets [i] = temp;
+			OnClickCenterView other = temp.GetComponent("OnClickCenterView") as OnClickCenterView;
+			other.setTargetPosition(temp.transform.position-newCenter);
+
 		}
+		flight = true;
 	}
 
 	public static Color HSVToRGB(float H, float S, float V)
