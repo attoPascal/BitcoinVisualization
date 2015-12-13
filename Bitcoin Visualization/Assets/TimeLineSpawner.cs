@@ -40,6 +40,11 @@ public class TimeLineSpawner : MonoBehaviour {
 			lRend.SetPosition(1, bottom);
 			lRend.SetWidth(0.2f,0.2f);
 
+			line.AddComponent<BlockInfos>();
+			line.GetComponent<BlockInfos>().Height = b.Height;
+			line.GetComponent<BlockInfos>().TransactionCount = b.Transactions.Count;
+			line.GetComponent<BlockInfos>().TimeStamp=b.Timestamp;
+
 			lines.Add (line);
 		}
 	}
