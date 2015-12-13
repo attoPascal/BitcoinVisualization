@@ -55,7 +55,7 @@ namespace UnityStandardAssets.Utility
 
 
 			if (Input.GetKey(KeyCode.Escape)) {
-				Application.LoadLevel ("SplashScreen");
+				Application.LoadLevel ("TimelineView");
 			}
 
 

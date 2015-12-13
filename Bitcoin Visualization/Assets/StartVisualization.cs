@@ -3,15 +3,18 @@ using System.Collections;
 
 public class StartVisualization : MonoBehaviour {
 
+	public static int BlocksToShow=500;
 	// Use this for initialization
 	void Start () {
 
 	}
-	
+	/*void Awake() {
+		DontDestroyOnLoad(transform.gameObject);
+	}*/
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKey(KeyCode.Space)) {
-			Application.LoadLevel ("SphereView");
+			Application.LoadLevel ("TimelineView");
 		}
 		if (Input.GetKey(KeyCode.Escape)) {
 			Application.Quit ();

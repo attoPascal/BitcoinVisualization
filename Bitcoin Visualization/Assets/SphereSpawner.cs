@@ -13,7 +13,7 @@ public class SphereSpawner : MonoBehaviour {
 
 	
 	private ArrayList planets;
-	private Vector3[] positions;
+	private ArrayList positions;
 	private bool flight=false;
 	private Vector3 newCenter;
 	private float speed=25;
@@ -34,10 +34,12 @@ public class SphereSpawner : MonoBehaviour {
 		InitArray();
 
 		GameObject planet;
-		for (int i = 0; i < numPlanets; i++) {
+		int i = 0;
+		foreach(Address a in input.Addresses) {
+			if(a.FirstTransaction.Block.Height>StartVisualization.BlocksToShow)continue;
 			//planets[i].position = PolarToCartesian(inArray[i]);
 			//planets[i]. = new Color(Random.Range (0f, 1f), Random.Range (0f, 1f),Random.Range (0f, 1f));
-			float scaleFactor = (float)input.Addresses[i].FirstTransaction.Outputs[0].Value/50;
+			float scaleFactor = (float)a.FirstTransaction.Outputs[0].Value/50;
 			Vector3 scaleVector = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			//Debug.Log(i);
 
@@ -45,26 +47,31 @@ public class SphereSpawner : MonoBehaviour {
 			//planet.GetComponent<Renderer> ().material.color = new Color(Random.Range(0f,1f),Random.Range(0f,1f),Random.Range(0f,1f));
 			planet.GetComponent<Renderer> ().material.color = HSVToRGB(Random.Range(0f, 1f), 1f, 1f);
 			planet.AddComponent<OnClickCenterView>();
-			planet.GetComponent<OnClickCenterView>().setAddress(input.Addresses[i].ID);
-			planet.GetComponent<OnClickCenterView>().setBlock(input.Addresses[i].FirstTransaction.Block.Height);
-			planet.GetComponent<OnClickCenterView>().setBalance((float)input.Addresses[i].FirstTransaction.Outputs[0].Value);
+			planet.GetComponent<OnClickCenterView>().setAddress(a.ID);
+			planet.GetComponent<OnClickCenterView>().setBlock(a.FirstTransaction.Block.Height);
+			planet.GetComponent<OnClickCenterView>().setBalance((float)a.FirstTransaction.Outputs[0].Value);
 
 			//	planet.GetComponent<Renderer>.material.setColor();
 			planet.transform.localScale += scaleVector;
-			planet.transform.position = positions[i];
+			planet.transform.position = (Vector3) positions[i];
 			planets.Add(planet);
+			i++;
 		}
-
+		numPlanets = i+1;
 	}
 
 
 	private void InitArray(){
 		float twoPi = Mathf.PI * 2;
-		positions = new Vector3[numPlanets];
-		for (int i = 0; i < positions.Length; i++) {
-			positions[i]= PolarToCartesian(new Vector3(input.Addresses[i].FirstTransaction.Block.Height/2, Random.Range(0f, twoPi), Random.Range(0f, twoPi)));
+		positions = new ArrayList ();
+		foreach (Address a in input.Addresses) {
+			if(a.FirstTransaction.Block.Height>StartVisualization.BlocksToShow)continue;
+			else{
+				positions.Add(PolarToCartesian(new Vector3(a.FirstTransaction.Block.Height/2, Random.Range(0f, twoPi), Random.Range(0f, twoPi))));
+			}
 		}
-		Debug.Log("positions acquired: "+positions.Length);
+
+		Debug.Log("positions acquired: "+positions.Count);
 	}
 
 
@@ -72,7 +79,7 @@ public class SphereSpawner : MonoBehaviour {
 	void Update () {
 		if (flight) {
 			float step = speed * Time.deltaTime;
-			foreach (GameObject go in planets) {
+			foreach(GameObject go in planets) {
 				OnClickCenterView other = go.GetComponent ("OnClickCenterView") as OnClickCenterView;
 				go.transform.position = Vector3.MoveTowards (go.transform.position, other.getTargetPosition (), step);
 			}
@@ -95,8 +102,8 @@ public class SphereSpawner : MonoBehaviour {
 
 	public void CenterView(Vector3 newCenter){
 		this.newCenter = newCenter;
-		for (int i = 0; i < numPlanets; i++) {
-			GameObject temp = (GameObject) planets [i];
+		foreach(GameObject temp in planets) {
+			//GameObject temp = (GameObject) planets [i];
 			//temp.transform.position += new Vector3 (-newCenter.x, -newCenter.y, -newCenter.z);
 			//planets [i] = temp;
 			OnClickCenterView other = temp.GetComponent("OnClickCenterView") as OnClickCenterView;

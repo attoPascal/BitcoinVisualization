@@ -34,7 +34,10 @@ public class TimelineCamera : MonoBehaviour
 		if (mouseClicked) {
 			transform.Translate(translateVector);
 		}
-
+		if (Input.GetKey(KeyCode.Escape)) {
+			Application.LoadLevel ("SplashScreen");
+		}
+		
 	}
 }
 

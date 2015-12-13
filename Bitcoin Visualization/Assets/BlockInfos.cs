@@ -20,7 +20,11 @@ public class BlockInfos : MonoBehaviour
 	{
 	
 	}
-
+	void OnMouseDown(){
+		StartVisualization.BlocksToShow = Height;
+		Debug.Log (StartVisualization.BlocksToShow);
+		Application.LoadLevel("SphereView");
+	}
 	void OnMouseEnter(){
 
 		infos = "Block Height: " + Height + "\n Transactions: " + TransactionCount + "\n TimeStamp: " + TimeStamp;

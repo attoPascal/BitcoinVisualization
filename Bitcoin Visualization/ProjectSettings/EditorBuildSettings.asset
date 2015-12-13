@@ -9,3 +9,5 @@ EditorBuildSettings:
     path: Assets/SplashScreen.unity
   - enabled: 1
     path: Assets/SphereView.unity
+  - enabled: 1
+    path: Assets/TimeLineView.unity
