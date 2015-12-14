@@ -3,6 +3,7 @@ using System.Collections;
 using Bitcoin;
 using DAO;
 using System.IO;
+using System.Linq;
 
 public class TimeLineSpawner : MonoBehaviour {
 
@@ -13,14 +14,15 @@ public class TimeLineSpawner : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
-			dataPath = @"../data/1000blocks/";
+			dataPath = @"../data/1000blocks.db";
 		} else if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor) {
-			dataPath = @"..\data\1000blocks\";
+			dataPath = @"..\data\1000blocks.db";
 			Debug.Log ("detected Windows OS");
 		}
-		input = new CSVDAO(dataPath);
+		input = new SQLiteDAO(dataPath);
 		lines = new ArrayList ();
-		float halfBlocks = input.Blocks.Count/2f;
+        var blocks = input.Blocks.ToList();
+        float halfBlocks = blocks.Count / 2f;
 		foreach (Block b in input.Blocks) {
 			GameObject line = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 			float blockTransactions = (float) b.Transactions.Count;

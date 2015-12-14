@@ -1,14 +1,15 @@
 ﻿using Bitcoin;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DAO
 {
     public interface BitcoinDAO
     {
-        List<Address> Addresses { get; }
-        List<Output> Outputs { get; }
-        List<Transaction> Transactions { get; }
-        List<Block> Blocks { get; }
+        IQueryable<Address> Addresses { get; }
+        IQueryable<Output> Outputs { get; }
+        IQueryable<Transaction> Transactions { get; }
+        IQueryable<Block> Blocks { get; }
 
         Address AddressWithID(string id);
         Output OutputWithID(string id);

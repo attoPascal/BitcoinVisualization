@@ -21,12 +21,12 @@ public class SphereSpawner : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
-			dataPath = @"../data/1000blocks/";
+			dataPath = @"../data/1000blocks.db";
 		} else if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor) {
-			dataPath = @"..\data\1000blocks\";
+			dataPath = @"..\data\1000blocks.db";
 			Debug.Log ("detected Windows OS");
 		}
-		input = new CSVDAO(dataPath);
+		input = new SQLiteDAO(dataPath);
 		//Debug.Log(System.Environment.CurrentDirectory);
 		numPlanets = 1000;
 		planets = new ArrayList();

@@ -3,6 +3,7 @@ using System.Collections;
 using Bitcoin;
 using DAO;
 using System.IO;
+using System.Linq;
 
 public class ParticleBehaviour : MonoBehaviour {
 
@@ -24,20 +25,21 @@ public class ParticleBehaviour : MonoBehaviour {
 		numPlanets = 1000;
 		expansionIncrement = 80f / (numPlanets - 1);
 		if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
-			dataPath = @"../data/1000blocks/";
+			dataPath = @"../data/1000blocks.db";
 		} else if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor) {
-			dataPath = @"..\data\1000blocks\";
+			dataPath = @"..\data\1000blocks.db";
 		}
-		input = new CSVDAO(dataPath);
+		input = new SQLiteDAO(dataPath);
 		//Debug.Log(System.Environment.CurrentDirectory);
 		planets = new ParticleSystem.Particle[numPlanets];
 		InitInArray();
 		float increment = 1f / (numPlanets - 1);
+        var addresses = input.Addresses.ToList();
 		for (int i =0; i<numPlanets; i++) {
 			float x = i * increment;
 			//planets[i].position = PolarToCartesian(inArray[i]);
 			planets[i].color = new Color(Random.Range (0f, 1f), Random.Range (0f, 1f),Random.Range (0f, 1f));
-			planets[i].size = (float)input.Addresses[i].FirstTransaction.Outputs[0].Value/50;
+			planets[i].size = (float)addresses[i].FirstTransaction.Outputs[0].Value/50;
 		}
 	}
 	void expand(){
@@ -65,9 +67,10 @@ public class ParticleBehaviour : MonoBehaviour {
 	//
 	void InitInArray(){
 		inArray = new Vector3[numPlanets];
+        var addresses = input.Addresses.ToList();
 		float twoPi = Mathf.PI * 2;
 		for (int i = 0;i<inArray.Length; i++) {
-			inArray[i]= new Vector3(input.Addresses[i].FirstTransaction.Block.Height/10, Random.Range(0f, twoPi), Random.Range(0f, twoPi));
+			inArray[i]= new Vector3(addresses[i].FirstTransaction.Block.Height/10, Random.Range(0f, twoPi), Random.Range(0f, twoPi));
 		}
 		currentExpansion = new Vector3[numPlanets];
 		for (int i= 0; i<currentExpansion.Length; i++) {
