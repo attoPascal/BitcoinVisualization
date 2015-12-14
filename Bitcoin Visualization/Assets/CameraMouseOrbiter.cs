@@ -30,7 +30,9 @@ namespace UnityStandardAssets.Utility
 		public float multiplier = -5f;
 		
 		public bool grab = false;
+		public bool grabR = false;
 		public CameraSpacePoint lastPos = new CameraSpacePoint();
+		public CameraSpacePoint lastPosR = new CameraSpacePoint();
 		public Quaternion lastCameraPos = new Quaternion ();
 
 		// Use this for initialization
@@ -118,10 +120,26 @@ namespace UnityStandardAssets.Utility
 
 						transform.RotateAround (transform.parent.position, new Vector3 (0, 1, 0), (pos.X - lastPos.X) * multiplier);
 						transform.RotateAround (transform.parent.position, new Vector3 (1, 0, 0), (pos.Y - lastPos.Y) * multiplier);
+
+
+						//transform.Translate (-currentVector*(pos.Z - lastPos.Z), Space.World);
+
 						transform.LookAt (transform.parent.position, transform.up);
 					}
 					else if (body.HandLeftState == HandState.Open){
 						grab = false;
+					}
+
+					if(body.HandRightState == HandState.Closed){
+						if(grabR == false){
+							lastPosR = body.Joints[JointType.HandRight].Position;
+						}
+						grabR = true;
+
+						transform.Translate (-currentVector*((body.Joints[JointType.HandRight].Position.Z - lastPosR.Z)/4), Space.World);
+					}
+					else if (body.HandRightState == HandState.Open){
+						grabR = false;
 					}
 				}
 			}
