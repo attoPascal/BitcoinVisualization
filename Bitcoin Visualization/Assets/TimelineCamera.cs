@@ -69,6 +69,7 @@ public class TimelineCamera : MonoBehaviour
 			}
 			if (body.IsTracked)
 			{
+
 				Debug.Log(body.HandLeftState.ToString());
 
 				if (body.HandLeftState == HandState.Closed){
@@ -80,10 +81,11 @@ public class TimelineCamera : MonoBehaviour
 
 					var pos = body.Joints[TrackedJoint].Position;
 
-					Debug.Log(pos.X);
-					//transform.position = new Vector3(lastObjPos.x + (pos.X - lastPos.X) * multiplier, 1, -10);
-					translateVector.Set ((pos.X - lastPos.X) * multiplier, 0, 0);
-					transform.Translate(translateVector);
+					Debug.Log(pos.X-lastPos.X);
+					transform.position = new Vector3(lastObjPos.x + (pos.X - lastPos.X) * multiplier, 1, -10);
+					//translateVector.Set (deltaTime*50*pos.X-lastPos.X , 0, 0);
+					//transform.Translate(translateVector);
+
 				}
 				else if (body.HandLeftState == HandState.Open){
 					grab = false;
