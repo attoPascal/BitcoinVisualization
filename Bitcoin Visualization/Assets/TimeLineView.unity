@@ -283,7 +283,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BodySrcManager: {fileID: 468756895}
-  TrackedJoint: 0
+  TrackedJoint: 7
   multiplier: 10
   grab: 0
   lastObjPos: {x: 0, y: 0, z: 0}

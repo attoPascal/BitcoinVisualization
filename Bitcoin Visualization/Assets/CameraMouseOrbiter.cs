@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
+using Windows.Kinect;
+
 
 namespace UnityStandardAssets.Utility
 {
@@ -19,13 +21,27 @@ namespace UnityStandardAssets.Utility
 
 		//private Vector3 rootPosition;
 		private Vector3 currentVector;
-		
 
+		//Kinect
+		public GameObject BodySrcManager;
+		public JointType TrackedJoint;
+		private BodySourceManager bodyManager;
+		private Body[] bodies;
+		public float multiplier = -5f;
+		
+		public bool grab = false;
+		public CameraSpacePoint lastPos = new CameraSpacePoint();
+		public Quaternion lastCameraPos = new Quaternion ();
 
 		// Use this for initialization
 		void Start ()
 		{
 			//rootPosition = transform.position;
+			if (BodySrcManager == null) {
+				Debug.Log ("Assign Game Object with Body Source manager");
+			} else {
+				bodyManager = BodySrcManager.GetComponent<BodySourceManager>();
+			}
 		}
 		
 		// Update is called once per frame
@@ -50,7 +66,7 @@ namespace UnityStandardAssets.Utility
 
 
 			transform.Translate (-currentVector*Input.GetAxis("Mouse ScrollWheel")*2*deltaTime, Space.World);
-			transform.LookAt (transform.parent.position);
+			transform.LookAt (transform.parent.position, transform.up);
 		
 
 
@@ -70,7 +86,45 @@ namespace UnityStandardAssets.Utility
 			}
 			*/
 
+
+			Debug.Log(gameObject.transform.rotation.x);
+			//Kinect
+			if (bodyManager == null) {
+				return;
+			}
+			bodies = bodyManager.GetData ();
+			
+			if (bodies == null) {
+				return;
+			}
+			
+			foreach (var body in bodies) {
+				if (body == null){
+					continue;
+				}
+				if (body.IsTracked)
+				{
+					
+					Debug.Log(body.HandLeftState.ToString());
+					
+					if (body.HandLeftState == HandState.Closed){
+						if(grab == false){
+							lastPos = body.Joints[TrackedJoint].Position;
+							lastCameraPos = gameObject.transform.rotation;
+						}
+						grab = true;
+						
+						var pos = body.Joints[TrackedJoint].Position;
+
+						transform.RotateAround (transform.parent.position, new Vector3 (0, 1, 0), (pos.X - lastPos.X) * multiplier);
+						transform.RotateAround (transform.parent.position, new Vector3 (1, 0, 0), (pos.Y - lastPos.Y) * multiplier);
+						transform.LookAt (transform.parent.position, transform.up);
+					}
+					else if (body.HandLeftState == HandState.Open){
+						grab = false;
+					}
+				}
+			}
 		}
 	}
-
 }

@@ -16,7 +16,7 @@ public class TimelineCamera : MonoBehaviour
 	public JointType TrackedJoint;
 	private BodySourceManager bodyManager;
 	private Body[] bodies;
-	public float multiplier = 10f;
+	public float multiplier = -15f;
 
 	public bool grab = false;
 	public CameraSpacePoint lastPos = new CameraSpacePoint();
