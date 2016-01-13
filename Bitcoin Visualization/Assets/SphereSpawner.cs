@@ -1,80 +1,56 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using Bitcoin;
 using DAO;
 using System.IO;
+using System.Linq;
 
 public class SphereSpawner : MonoBehaviour {
 
-	string dataPath = "";
-	BitcoinDAO input;
-	int numPlanets;
-	
-
-	
-	private ArrayList planets;
-	private ArrayList positions;
-	private bool flight=false;
-	private Vector3 newCenter;
+	private BitcoinDAO dao;
+	private int numPlanets;
+	private List<GameObject> planets = new List<GameObject>();
+	private List<Vector3> positions = new List<Vector3>();
+	private bool flight = false;
+	private Vector3 newCenter = new Vector3 (0, 0, 0);
 	private float speed=25;
 
 	// Use this for initialization
 	void Start () {
-		if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
-			dataPath = @"../data/1000blocks.db";
-		} else if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor) {
-			dataPath = @"..\data\1000blocks.db";
-			Debug.Log ("detected Windows OS");
-		}
-		input = new SQLiteDAO(dataPath);
-		//Debug.Log(System.Environment.CurrentDirectory);
-		numPlanets = 1000;
-		planets = new ArrayList();
-		newCenter = new Vector3 (0, 0, 0);
-		InitArray();
+		var slash = Path.DirectorySeparatorChar;
+		var dataPath = Application.dataPath + slash + ".." + slash + ".." + slash + "database.sqlite";
+		dao = new SQLiteDAO(dataPath);
 
-		GameObject planet;
 		int i = 0;
-		foreach(Address a in input.Addresses) {
-			if(a.FirstTransaction.Block.Height>StartVisualization.BlocksToShow)continue;
-			//planets[i].position = PolarToCartesian(inArray[i]);
-			//planets[i]. = new Color(Random.Range (0f, 1f), Random.Range (0f, 1f),Random.Range (0f, 1f));
-			float scaleFactor = (float)a.FirstTransaction.Outputs[0].Value/50;
-			Vector3 scaleVector = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-			//Debug.Log(i);
+		float tau = Mathf.PI * 2;
 
-			planet = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-			//planet.GetComponent<Renderer> ().material.color = new Color(Random.Range(0f,1f),Random.Range(0f,1f),Random.Range(0f,1f));
-			planet.GetComponent<Renderer> ().material.color = HSVToRGB(Random.Range(0f, 1f), 1f, 1f);
-			planet.AddComponent<OnClickCenterView>();
-			planet.GetComponent<OnClickCenterView>().setAddress(a.ID);
-			planet.GetComponent<OnClickCenterView>().setBlock(a.FirstTransaction.Block.Height);
-			planet.GetComponent<OnClickCenterView>().setBalance((float)a.FirstTransaction.Outputs[0].Value);
+		foreach (Address address in dao.Addresses.ToList())
+		{
+			if (address.FirstTransaction.Block.Height <= StartVisualization.BlocksToShow)
+			{
+				// init position
+				positions.Add(PolarToCartesian(new Vector3(address.FirstTransaction.Block.Height/2, Random.Range(0f, tau), Random.Range(0f, tau))));
 
-			//	planet.GetComponent<Renderer>.material.setColor();
-			planet.transform.localScale += scaleVector;
-			planet.transform.position = (Vector3) positions[i];
-			planets.Add(planet);
-			i++;
+				// init planet
+				float scaleFactor = (float) address.FirstTransaction.Outputs [0].Value / 50;
+				Vector3 scaleVector = new Vector3 (scaleFactor, scaleFactor, scaleFactor);
+
+				GameObject planet = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+				planet.GetComponent<Renderer>().material.color = HSVToRGB (Random.Range (0f, 1f), 1f, 1f);
+				planet.AddComponent<OnClickCenterView>();
+				planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
+				planet.GetComponent<OnClickCenterView>().setBlock (address.FirstTransaction.Block.Height);
+				planet.GetComponent<OnClickCenterView>().setBalance ((float) address.FirstTransaction.Outputs[0].Value);
+
+				planet.transform.localScale += scaleVector;
+				planet.transform.position = (Vector3) positions[i];
+				planets.Add (planet);
+				i++;
+			}
 		}
 		numPlanets = i+1;
 	}
-
-
-	private void InitArray(){
-		float twoPi = Mathf.PI * 2;
-		positions = new ArrayList ();
-		foreach (Address a in input.Addresses) {
-			if(a.FirstTransaction.Block.Height>StartVisualization.BlocksToShow)continue;
-			else{
-				positions.Add(PolarToCartesian(new Vector3(a.FirstTransaction.Block.Height/2, Random.Range(0f, twoPi), Random.Range(0f, twoPi))));
-			}
-		}
-
-		Debug.Log("positions acquired: "+positions.Count);
-	}
-
-
+		
 	// Update is called once per frame
 	void Update () {
 		if (flight) {
