@@ -75,6 +75,34 @@ namespace DAO
             return Transactions.Where(t => t.ID == id).Single();
         }
 
+		public void InitializeAddressProfits()
+		{
+			using (var context = new DataContext(dbConnection)) {
+				foreach (var address in context.GetTable<Address>()) {
+					double profit = 0.0;
+
+					foreach (var output in address.Outputs) {
+						bool splitTX = false;
+						foreach (var input in output.Transaction.Inputs) {
+							if (input.AddressID == address.ID) {
+								splitTX = true;
+								break;
+							}
+						}
+
+						if (!splitTX) {
+							profit += output.Value;
+						}
+					}
+						
+					address.Profit = profit;
+				}
+
+				context.SubmitChanges ();
+				UnityEngine.Debug.Log ("db updated");
+			}
+		}
+
 		public void InitializeAddressFirstOccurrences()
 		{
 			using (var context = new DataContext(dbConnection)) {

@@ -8,6 +8,7 @@ namespace Bitcoin
     public class Address
     {
         private string id;
+		private double profit;
 		private int firstOccurrenceBlockHeight;
         private EntitySet<Output> outputs = new EntitySet<Output>();
 
@@ -17,6 +18,13 @@ namespace Bitcoin
             get { return id; }
             set { id = value; }
         }
+
+		[Column(Storage = "profit")]
+		public double Profit
+		{
+			get { return profit; }
+			set { profit = value; }
+		}
 
 		[Column(Storage = "firstOccurrenceBlockHeight")]
 		public int FirstOccurrenceBlockHeight
@@ -32,36 +40,9 @@ namespace Bitcoin
             set { outputs.Assign(value); }
         }
 
-        public Transaction FirstTransaction
-        {
-            get
-            {
-                // TODO: linq
-                var firstTx = Outputs.First().Transaction;
-                foreach (var output in Outputs)
-                {
-                    var tx = output.Transaction;
-                    if (tx.Block.Height < firstTx.Block.Height)
-                    {
-                        firstTx = tx;
-                    }
-                }
-                return firstTx;
-            }
-        }
-
-        public double Balance
-        {
-            get
-            {
-                //TODO: correct implementation
-                var balance = 0.0;
-                foreach (var output in Outputs)
-                {
-                    balance += output.Value;
-                }
-                return balance;
-            }
-        }
+		public double BalanceAfterBlock(int height) {
+			// TODO: calculations
+			return 0;
+		}
     }
 }
