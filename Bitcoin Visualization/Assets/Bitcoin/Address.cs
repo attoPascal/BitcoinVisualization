@@ -8,6 +8,7 @@ namespace Bitcoin
     public class Address
     {
         private string id;
+		private int firstOccurrenceBlockHeight;
         private EntitySet<Output> outputs = new EntitySet<Output>();
 
         [Column(IsPrimaryKey = true, Storage = "id")]
@@ -16,6 +17,13 @@ namespace Bitcoin
             get { return id; }
             set { id = value; }
         }
+
+		[Column(Storage = "firstOccurrenceBlockHeight")]
+		public int FirstOccurrenceBlockHeight
+		{
+			get { return firstOccurrenceBlockHeight; }
+			set { firstOccurrenceBlockHeight = value; }
+		}
 
         [Association(Name = "AddressOutputs", Storage = "outputs", OtherKey = "AddressID")]
         public EntitySet<Output> Outputs

@@ -74,5 +74,30 @@ namespace DAO
         {
             return Transactions.Where(t => t.ID == id).Single();
         }
+
+		public void InitializeAddressFirstOccurrences()
+		{
+			using (var context = new DataContext(dbConnection)) {
+				foreach (var address in context.GetTable<Address>()) {
+					UnityEngine.Debug.Log ("updating address " + address.ID);
+					
+					var firstOccHeight = address.Outputs.First ().Transaction.Block.Height;
+					foreach (var output in address.Outputs) {
+						var height = output.Transaction.Block.Height;
+						if (height < firstOccHeight) {
+							firstOccHeight = height;
+						}
+					}
+
+					UnityEngine.Debug.Log ("previous height: " + address.FirstOccurrenceBlockHeight);
+
+					address.FirstOccurrenceBlockHeight = firstOccHeight;
+					UnityEngine.Debug.Log ("new height: " + address.FirstOccurrenceBlockHeight);
+				}
+
+				context.SubmitChanges ();
+				UnityEngine.Debug.Log ("db updated");
+			}
+		}
     }
 }

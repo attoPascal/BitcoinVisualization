@@ -21,32 +21,40 @@ public class SphereSpawner : MonoBehaviour {
 		var dataPath = Application.dataPath + slash + ".." + slash + ".." + slash + "database.sqlite";
 		dao = new SQLiteDAO(dataPath);
 
+		//((SQLiteDAO)dao).InitializeAddressFirstOccurrences();
+
 		int i = 0;
 		float tau = Mathf.PI * 2;
 
-		foreach (Address address in dao.Addresses.ToList())
+		var blocksToShow = StartVisualization.BlocksToShow;
+		var addresses =
+			from a in dao.Addresses
+			where a.FirstOccurrenceBlockHeight <= blocksToShow
+			select a;
+
+		// TODO: check if ToList makes it better or worse
+		foreach (var address in addresses.ToList())
 		{
-			if (address.FirstTransaction.Block.Height <= StartVisualization.BlocksToShow)
-			{
-				// init position
-				positions.Add(PolarToCartesian(new Vector3(address.FirstTransaction.Block.Height/2, Random.Range(0f, tau), Random.Range(0f, tau))));
+			// init position
+			positions.Add(PolarToCartesian(new Vector3(address.FirstOccurrenceBlockHeight/2, Random.Range(0f, tau), Random.Range(0f, tau))));
 
-				// init planet
-				float scaleFactor = (float) address.FirstTransaction.Outputs [0].Value / 50;
-				Vector3 scaleVector = new Vector3 (scaleFactor, scaleFactor, scaleFactor);
+			// init planet
+			// TODO: balance
+			float scaleFactor = (float) address.FirstTransaction.Outputs[0].Value / 50;
+			Vector3 scaleVector = new Vector3 (scaleFactor, scaleFactor, scaleFactor);
 
-				GameObject planet = GameObject.CreatePrimitive (PrimitiveType.Sphere);
-				planet.GetComponent<Renderer>().material.color = HSVToRGB (Random.Range (0f, 1f), 1f, 1f);
-				planet.AddComponent<OnClickCenterView>();
-				planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
-				planet.GetComponent<OnClickCenterView>().setBlock (address.FirstTransaction.Block.Height);
-				planet.GetComponent<OnClickCenterView>().setBalance ((float) address.FirstTransaction.Outputs[0].Value);
+			GameObject planet = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+			planet.GetComponent<Renderer>().material.color = HSVToRGB (Random.Range (0f, 1f), 1f, 1f);
+			planet.AddComponent<OnClickCenterView>();
+			planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
+			planet.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
+			// TODO: balance
+			planet.GetComponent<OnClickCenterView>().setBalance ((float) address.FirstTransaction.Outputs[0].Value);
 
-				planet.transform.localScale += scaleVector;
-				planet.transform.position = (Vector3) positions[i];
-				planets.Add (planet);
-				i++;
-			}
+			planet.transform.localScale += scaleVector;
+			planet.transform.position = (Vector3) positions[i];
+			planets.Add (planet);
+			i++;
 		}
 		numPlanets = i+1;
 	}
