@@ -62,8 +62,11 @@ namespace UnityStandardAssets.Utility
 				mouseClicked = false;
 
 			if (mouseClicked) {
-				transform.RotateAround (transform.parent.position, new Vector3 (0, 1, 0), mousePosX * 200 * deltaTime);
-				transform.RotateAround (transform.parent.position, new Vector3 (1, 0, 0), mousePosY * 300 * deltaTime);
+				//transform.RotateAround (transform.parent.position, new Vector3 (0, 1, 0), mousePosX * 200 * deltaTime);
+				//transform.RotateAround (transform.parent.position, new Vector3 (1, 0, 0), mousePosY * 300 * deltaTime);
+				transform.position = Quaternion.Euler(mousePosY*200*deltaTime, mousePosX*300*deltaTime,0) *  transform.position;
+				//transform.position = Quaternion.AngleAxis(mousePosX*300*deltaTime, gameObject.transform.up) * transform.position;
+				transform.LookAt(transform.parent.position);
 			}
 
 

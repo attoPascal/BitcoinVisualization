@@ -3,7 +3,7 @@ using System.Collections;
 
 public class StartVisualization : MonoBehaviour {
 
-	public static int BlocksToShow=500;
+	public static int BlocksToShow=5;
 	// Use this for initialization
 	void Start () {
 

@@ -14,6 +14,9 @@ public class SphereSpawner : MonoBehaviour {
 	private bool flight = false;
 	private Vector3 newCenter = new Vector3 (0, 0, 0);
 	private float speed=25;
+	public bool play = true;
+	private float expDT = 0; 
+	float tau = Mathf.PI * 2;
 
 	// Use this for initialization
 	void Start () {
@@ -22,12 +25,13 @@ public class SphereSpawner : MonoBehaviour {
 		dao = new SQLiteDAO(dataPath);
 
 		int i = 0;
-		float tau = Mathf.PI * 2;
+
 
 		var numBlocks = StartVisualization.BlocksToShow;
 		var addresses =
 			from a in dao.Addresses
 			where a.FirstOccurrenceBlockHeight <= numBlocks && a.FirstOccurrenceBlockHeight > 0
+			orderby a.FirstOccurrenceBlockHeight
 			select a;
 
 		// TODO: check if ToList makes it better or worse
@@ -48,7 +52,7 @@ public class SphereSpawner : MonoBehaviour {
 			planet.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
 			planet.GetComponent<OnClickCenterView>().setBalance ((float) balance);
 
-			planet.transform.localScale += scaleVector;
+			planet.transform.localScale = scaleVector;
 			planet.transform.position = (Vector3) positions[i];
 			planets.Add (planet);
 			i++;
@@ -69,6 +73,44 @@ public class SphereSpawner : MonoBehaviour {
 				flight = false;
 			}
 			//Debug.Log ("flying: "+flight);
+		}
+		//expansion of Universe
+		expDT += Time.deltaTime;
+		if (play&&expDT>=0.5f) {
+			int i = 0;
+			StartVisualization.BlocksToShow+=10;
+			var numBlocks = StartVisualization.BlocksToShow;
+			var addresses =
+				from a in dao.Addresses
+				where a.FirstOccurrenceBlockHeight <= numBlocks && a.FirstOccurrenceBlockHeight > 0
+				orderby a.FirstOccurrenceBlockHeight
+				select a;
+			foreach (var address in addresses.ToList()){
+				if(i<planets.Count){ //change size an balance of currently shown planet
+					float newBal = (float) address.BalanceAfterBlock(numBlocks);
+					planets[i].GetComponent<OnClickCenterView>().setBalance (newBal);
+					float scaleFactor = (float) newBal / 50;
+					Vector3 scaleVector = new Vector3 (scaleFactor, scaleFactor, scaleFactor);
+					planets[i].transform.localScale = scaleVector;
+				}else{ // add new Planet
+					var balance = address.BalanceAfterBlock(numBlocks);
+					float scaleFactor = (float) balance / 50;
+					Vector3 scaleVector = new Vector3 (scaleFactor, scaleFactor, scaleFactor);
+					
+					GameObject planet = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+					planet.GetComponent<Renderer>().material.color = HSVToRGB (Random.Range (0f, 1f), 1f, 1f);
+					planet.AddComponent<OnClickCenterView>();
+					planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
+					planet.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
+					planet.GetComponent<OnClickCenterView>().setBalance ((float) balance);
+					
+					planet.transform.localScale = scaleVector;
+					planet.transform.position = PolarToCartesian(new Vector3(address.FirstOccurrenceBlockHeight/2, Random.Range(0f, tau), Random.Range(0f, tau)));
+					planets.Add (planet);
+				}
+				i++;
+			}
+			expDT = 0f;
 		}
 	}
 
