@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class BlockInfos : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class BlockInfos : MonoBehaviour
 	}
 	void OnMouseEnter(){
 
-		infos = "Block Height: " + Height + "\n Transactions: " + TransactionCount + "\n TimeStamp: " + TimeStamp;
+		infos = "Block Height: " + Height + "\n Transactions: " + TransactionCount + "\n TimeStamp: " + UnixTimeStampToDateTime(TimeStamp).ToString();
 		_guiOn = true;
 	}
 	
@@ -53,6 +54,13 @@ public class BlockInfos : MonoBehaviour
 			}
 			GUI.Box (new Rect (boxX, boxY, 350, 50), infos);
 		}
+	}
+	public static System.DateTime UnixTimeStampToDateTime( int unixTimeStamp )
+	{
+		// Unix timestamp is seconds past epoch
+		System.DateTime dtDateTime = new DateTime(1970,1,1,0,0,0,0,System.DateTimeKind.Utc);
+		dtDateTime = dtDateTime.AddSeconds( unixTimeStamp ).ToLocalTime();
+		return dtDateTime;
 	}
 }
 
