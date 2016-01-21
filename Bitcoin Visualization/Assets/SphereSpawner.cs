@@ -21,15 +21,13 @@ public class SphereSpawner : MonoBehaviour {
 		var dataPath = Application.dataPath + slash + ".." + slash + ".." + slash + "database.sqlite";
 		dao = new SQLiteDAO(dataPath);
 
-		//((SQLiteDAO)dao).InitializeAddressProfits();
-
 		int i = 0;
 		float tau = Mathf.PI * 2;
 
 		var numBlocks = StartVisualization.BlocksToShow;
 		var addresses =
 			from a in dao.Addresses
-			where a.FirstOccurrenceBlockHeight <= numBlocks
+			where a.FirstOccurrenceBlockHeight <= numBlocks && a.FirstOccurrenceBlockHeight > 0
 			select a;
 
 		// TODO: check if ToList makes it better or worse
@@ -39,7 +37,8 @@ public class SphereSpawner : MonoBehaviour {
 			positions.Add(PolarToCartesian(new Vector3(address.FirstOccurrenceBlockHeight/2, Random.Range(0f, tau), Random.Range(0f, tau))));
 
 			// init planet
-			float scaleFactor = (float) address.Profit / 50;
+			var balance = address.BalanceAfterBlock(numBlocks);
+			float scaleFactor = (float) balance / 50;
 			Vector3 scaleVector = new Vector3 (scaleFactor, scaleFactor, scaleFactor);
 
 			GameObject planet = GameObject.CreatePrimitive (PrimitiveType.Sphere);
@@ -47,7 +46,7 @@ public class SphereSpawner : MonoBehaviour {
 			planet.AddComponent<OnClickCenterView>();
 			planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
 			planet.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
-			planet.GetComponent<OnClickCenterView>().setBalance ((float) address.BalanceAfterBlock(numBlocks));
+			planet.GetComponent<OnClickCenterView>().setBalance ((float) balance);
 
 			planet.transform.localScale += scaleVector;
 			planet.transform.position = (Vector3) positions[i];
