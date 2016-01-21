@@ -252,3 +252,5 @@ _Pvt_Extensions
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
 
+big-database.sqlite
+big-database.sqlite-journal
