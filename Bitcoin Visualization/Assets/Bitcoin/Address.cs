@@ -10,7 +10,9 @@ namespace Bitcoin
         private string id;
 		private double profit;
 		private int firstOccurrenceBlockHeight;
+
         private EntitySet<Output> outputs = new EntitySet<Output>();
+		private EntitySet<Payment> payments = new EntitySet<Payment>();
 
         [Column(IsPrimaryKey = true, Storage = "id")]
         public string ID
@@ -40,9 +42,15 @@ namespace Bitcoin
             set { outputs.Assign(value); }
         }
 
+		[Association(Name = "AddressPayments", Storage = "payments", OtherKey = "AddressID")]
+		public EntitySet<Payment> Payments
+		{
+			get { return payments; }
+			set { payments.Assign(value); }
+		}
+
 		public double BalanceAfterBlock(int height) {
-			// TODO: calculations
-			return 0;
+			return Payments.Where(p => p.BlockHeight <= height).Sum(p => p.Value);
 		}
     }
 }

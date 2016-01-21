@@ -127,5 +127,40 @@ namespace DAO
 				UnityEngine.Debug.Log ("db updated");
 			}
 		}
+
+		public void InitializePayments()
+		{
+			using (var context = new DataContext (dbConnection)) {
+				foreach (var block in context.GetTable<Block>()) {
+					foreach (var tx in block.Transactions) {
+						// negative values
+						foreach (var input in tx.Inputs) {
+							Payment payment = new Payment {
+								AddressID = input.AddressID,
+								TransactionID = input.TransactionID,
+								BlockHeight = block.Height,
+								Value = -input.Value
+							};
+
+							context.GetTable<Payment> ().InsertOnSubmit (payment);
+						}
+
+						// positive values
+						foreach (var output in tx.Outputs) {
+							Payment payment = new Payment {
+								AddressID = output.AddressID,
+								TransactionID = output.TransactionID,
+								BlockHeight = block.Height,
+								Value = output.Value
+							};
+
+							context.GetTable<Payment> ().InsertOnSubmit (payment);
+						}
+					}
+				}
+
+				context.SubmitChanges ();
+			}
+		}
     }
 }
