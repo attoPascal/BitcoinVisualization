@@ -169,9 +169,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 375486084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c391e75baa924c24a8375cdbe5a8339, type: 3}
+  m_Script: {fileID: 11500000, guid: 39322f3afd2566f4d9787300f9d3253f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  play: 1
 --- !u!4 &375486086
 Transform:
   m_ObjectHideFlags: 0
@@ -182,6 +183,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 1167176105}
   - {fileID: 1169426399}
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -224,6 +226,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
+--- !u!1 &1167176104
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1167176105}
+  m_Layer: 0
+  m_Name: Universe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1167176105
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1167176104}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 375486086}
+  m_RootOrder: 0
 --- !u!1 &1169426398
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,7 +284,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 375486086}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!114 &1169426400
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,14 +293,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1169426398}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca49ce8f30408854393b4d15efb9fe61, type: 3}
+  m_Script: {fileID: 11500000, guid: b59e821a012e3074bbddd698c2e38925, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BodySrcManager: {fileID: 997122163}
+  BodySrcManager: {fileID: 0}
   TrackedJoint: 0
-  multiplier: -15
+  multiplier: -5
   grab: 0
-  lastObjPos: {x: 0, y: 0, z: 0}
+  grabR: 0
+  lastCameraPos: {x: 0, y: 0, z: 0, w: 0}
 --- !u!81 &1169426401
 AudioListener:
   m_ObjectHideFlags: 0
