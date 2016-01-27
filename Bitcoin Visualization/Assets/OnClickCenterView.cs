@@ -69,12 +69,13 @@ public class OnClickCenterView : MonoBehaviour {
     }
     public void OnKinectExit()
     {
-        gameObject.GetComponent<Renderer>().material.color = startColorKinect;
+        gameObject.GetComponent<Renderer>().material.color = Color.gray;
         _kinectGuiOn = false;
     }
     void OnMouseExit(){
 		gameObject.GetComponent<Renderer> ().material.color = startColor;
 		_guiOn = false;
+        OnKinectExit();
 	}
 	void OnGUI(){
 		if (_guiOn) {

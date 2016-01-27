@@ -234,7 +234,7 @@ namespace UnityStandardAssets.Utility
 
         private void TrackHandMovement(Body body)
         {
-            double MoveThreshold = 0.005;
+            double MoveThreshold = 0.0008;
 
             Windows.Kinect.Joint leftHand = body.Joints[JointType.HandLeft];
             Windows.Kinect.Joint rightHand = body.Joints[JointType.HandRight];
