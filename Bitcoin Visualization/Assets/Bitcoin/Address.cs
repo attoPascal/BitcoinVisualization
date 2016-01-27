@@ -21,21 +21,21 @@ namespace Bitcoin
             set { id = value; }
         }
 
-		[Column(Storage = "profit")]
+		[Column(Storage = "profit", UpdateCheck = UpdateCheck.Never)]
 		public double Profit
 		{
 			get { return profit; }
 			set { profit = value; }
 		}
 
-		[Column(Storage = "firstOccurrenceBlockHeight")]
+		[Column(Storage = "firstOccurrenceBlockHeight", UpdateCheck = UpdateCheck.Never)]
 		public int FirstOccurrenceBlockHeight
 		{
 			get { return firstOccurrenceBlockHeight; }
 			set { firstOccurrenceBlockHeight = value; }
 		}
 
-        [Association(Name = "AddressOutputs", Storage = "outputs", OtherKey = "AddressID")]
+		[Association(Name = "AddressOutputs", Storage = "outputs", OtherKey = "AddressID")]
         public EntitySet<Output> Outputs
         {
             get { return outputs; }

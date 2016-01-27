@@ -1,8 +1,10 @@
-﻿using System;
-using System.Data;
-using System.Linq;
-using Bitcoin;
+﻿using Bitcoin;
 using DAO;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System.Data.Linq;
 
 namespace DatabaseTools
 {
@@ -13,28 +15,78 @@ namespace DatabaseTools
 		public static void Main (string[] args)
 		{
 			dao = new SQLiteDAO ("../../../big-database.sqlite");
+			var newDAO = new SQLiteDAO ("../../../pizza-1000.sqlite");
 
-			// Console.WriteLine ("Inizializing payments...");
-			initializePayments ();
+			var minBlock = 56044;
+			var maxBlock = 57043;
 
-			//Console.WriteLine ("Initializing first occurrences...");
-			//initializeAddressFirstOccurrences2();
+			insertPayments (minBlock, maxBlock, newDAO);
+			Console.Out.WriteLine ("payments inserted");
+
+			var interestingAddresses = new List<Address> ();
+
+			for (int i = minBlock; i <= maxBlock; i++) {
+				var newAddresses = addressesInBlock (i);
+
+				foreach (var address in newAddresses) {
+					if (!interestingAddresses.Any (a => a.ID == address.ID)) {
+						interestingAddresses.Add (address);
+					}
+				}
+			}
+			Console.Out.WriteLine ("found " + interestingAddresses.Count + " addresses");
+
+			using (var context = newDAO.NewDataContext) {
+				context.GetTable<Address> ().InsertAllOnSubmit (interestingAddresses);
+				context.SubmitChanges ();
+				Console.Out.WriteLine ("inserted " + interestingAddresses.Count + " addresses");
+
+				updateFirstOcccurrences (interestingAddresses, minBlock, maxBlock);
+				context.SubmitChanges ();
+				Console.Out.WriteLine ("first occurences updated");
+
+				foreach (var address in interestingAddresses) {
+					var profit = address.BalanceAfterBlock (maxBlock);
+					if (profit > 0) {
+						address.Profit = profit;
+					}
+				}
+				context.SubmitChanges ();
+				Console.Out.WriteLine ("balance updated");
+			}
+
+			insertOtherTables (minBlock, maxBlock, newDAO);
+			Console.Out.WriteLine ("other tables inserted");
+
 		}
 
-		private static void initializePayments()
-		{
-			for (int i = 50; i <= 181; i++) {
-				var lowerBound = i * 1000;
-				var upperBound = lowerBound + 1000;
+		private static List<Address> addressesInBlock(int height) {
+			var block = dao.BlockWithHeight (height);
+			var addresses = new List<Address> ();
 
-				Console.Out.WriteLine ("Get blocks between " + lowerBound + " and " + upperBound);
+			foreach (var tx in block.Transactions) {
+				foreach (var output in tx.Outputs) {
+					if (!addresses.Any (a => a.ID == output.AddressID)) {
+						addresses.Add (output.Address);
+					}
+				}
+			}
 
-				using (var context = dao.NewDataContext) {
-					var payments = context.GetTable<Payment> ();
+			return addresses;
+		}
 
-					foreach (var block in context.GetTable<Block>().Where(b => (b.Height >= lowerBound && b.Height < upperBound))) {
-						Console.Write ("Block " + block.Height);
+		private static void insertPayments(int minBlock, int maxBlock, SQLiteDAO newDAO) {
+			Console.Out.WriteLine ("blocks between " + minBlock + " and " + maxBlock);
 
+			using (var oldContext = dao.NewDataContext) {
+				using (var newContext = newDAO.NewDataContext) {
+					var blocks = oldContext.GetTable<Block> ().Where (b => (b.Height >= minBlock && b.Height <= maxBlock));
+					var payments = newContext.GetTable<Payment> ();
+
+					foreach (var block in blocks) {
+						Console.WriteLine ("Block " + block.Height);
+
+						// insert payments
 						foreach (var tx in block.Transactions) {
 							// negative values
 							foreach (var input in tx.Inputs) {
@@ -45,7 +97,7 @@ namespace DatabaseTools
 									Value = -input.Value
 								};
 
-								payments.InsertOnSubmit(payment);
+								payments.InsertOnSubmit (payment);
 							}
 
 							// positive values
@@ -57,113 +109,87 @@ namespace DatabaseTools
 									Value = output.Value
 								};
 
-								payments.InsertOnSubmit(payment);
+								payments.InsertOnSubmit (payment);
 							}
 						}
-
-						Console.WriteLine (" done");
 					}
 
-					context.SubmitChanges ();
+					newContext.SubmitChanges ();
 					Console.WriteLine ("changes submitted");
 				}
-
-				Console.WriteLine ("finished");
 			}
 		}
 
-		private static void initializeAddressProfits()
-		{
-			using (var context = dao.NewDataContext) {
-				foreach (var address in context.GetTable<Address>()) {
-					double profit = 0.0;
+		private static void updateFirstOcccurrences(IEnumerable addresses, int minBlock, int maxBlock) {
+			var blocks = dao.Blocks.Where (b => (b.Height >= minBlock && b.Height <= maxBlock));
 
-					foreach (var output in address.Outputs) {
-						bool splitTX = false;
-						foreach (var input in output.Transaction.Inputs) {
-							if (input.AddressID == address.ID) {
-								splitTX = true;
-								break;
-							}
-						}
-
-						if (!splitTX) {
-							profit += output.Value;
+			foreach (var block in blocks) {
+				foreach (var tx in block.Transactions) {
+					foreach (var output in tx.Outputs) {
+						var address = output.Address;
+						if (address != null && address.FirstOccurrenceBlockHeight < minBlock) {
+							address.FirstOccurrenceBlockHeight = block.Height;
 						}
 					}
+				}
+			}
+		}
 
-					address.Profit = profit;
+		private static void insertOtherTables(int minBlock, int maxBlock, SQLiteDAO newDAO) {
+			var oldBlocks = dao.Blocks.Where (b => (b.Height >= minBlock && b.Height <= maxBlock));
+
+			var blocks = new List<Block> ();
+			var transactions = new List<Transaction> ();
+			var outputs = new List<Output> ();
+
+			foreach (var block in oldBlocks) {
+				if (!blocks.Any (b => b.ID == block.ID)) {
+					blocks.Add (block);
 				}
 
+				foreach (var tx in block.Transactions) {
+					if (transactions.Exists (t => t.ID == tx.ID)) {
+						Console.Out.WriteLine ("found double: " + tx.ID);
+					} else {
+						transactions.Add (tx);
+//						Console.Out.WriteLine (tx.ID);
+//						context.GetTable<Transaction>().InsertOnSubmit (tx);
+//						context.SubmitChanges ();
+					}
+
+					foreach (var output in tx.Outputs) {
+						if (!outputs.Any (o => o.ID == output.ID)) {
+							outputs.Add (output);
+						}
+					}
+				}
+			}
+
+			using (var context = newDAO.NewDataContext) {
+				context.GetTable<Block> ().InsertAllOnSubmit (blocks);
+				Console.Out.WriteLine ("inserting " + blocks.Count + " blocks");
 				context.SubmitChanges ();
-				Console.Out.WriteLine ("db updated");
 			}
-		}
 
-		private static void initializeAddressFirstOccurrences()
-		{
-			using (var context = dao.NewDataContext) {
-				int thousands = 0;
+//				//context.GetTable<Transaction>().InsertAllOnSubmit (transactions);
+//				var txTable = context.GetTable<Transaction> ();
+//				Console.Out.WriteLine ("inserting " + transactions.Count + " transactions");
+//				foreach (var tx in transactions) {
+//					txTable.InsertOnSubmit (tx);
+//					Console.Out.WriteLine (tx.ID);
+//					context.SubmitChanges ();
+//				}
+//
+//				context.SubmitChanges ();
+//
+//				context.GetTable<Output> ().InsertAllOnSubmit (outputs);
+//				Console.Out.WriteLine ("inserting " + outputs.Count + " outputs");
+//				context.SubmitChanges ();
 
-				while (true) {
-					var lowerBound = thousands * 1000;
-					var upperBound = lowerBound + 1000;
 
-					Console.Out.WriteLine ("Get addresses between " + lowerBound + " and " + upperBound);
 
-					var addresses = context.GetTable<Address> ();
-					foreach (var address in addresses.Skip(lowerBound).Take(1000)) {
-						var firstOccHeight = address.Outputs.First().Transaction.Block.Height;
-						foreach (var output in address.Outputs) {
-							var height = output.Transaction.Block.Height;
-							if (height < firstOccHeight) {
-								firstOccHeight = height;
-							}
-						}
 
-						address.FirstOccurrenceBlockHeight = firstOccHeight;
-					}
-
-					context.SubmitChanges();
-					Console.Out.WriteLine (upperBound + " addresses updated");
-
-					thousands++;
-				}
-			}
-		}
-
-		private static void initializeAddressFirstOccurrences2()
-		{
-			int thousands = 28;
-
-			while (true) {
-				var lowerBound = thousands * 1000;
-				var upperBound = lowerBound + 1000;
-
-				Console.Out.WriteLine ("Get blocks between " + lowerBound + " and " + upperBound);
-
-				using (var context = dao.NewDataContext) {
-					foreach (var block in context.GetTable<Block>().Where(b => (b.Height >= lowerBound && b.Height < upperBound))) {
-						Console.Write ("Block " + block.Height);
-
-						foreach (var tx in block.Transactions) {
-							foreach (var output in tx.Outputs) {
-								var address = output.Address;
-								if (address.FirstOccurrenceBlockHeight == 0) {
-									address.FirstOccurrenceBlockHeight = block.Height;
-								}
-							}
-						}
-
-						Console.WriteLine (" done");
-					}
-
-					context.SubmitChanges ();
-					Console.WriteLine ("changes submitted");
-				}
-
-				thousands++;
-			}
+			Console.Out.WriteLine ("all changes submitted");
 		}
 	}
 }
