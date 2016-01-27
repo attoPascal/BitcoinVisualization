@@ -15,8 +15,17 @@ public class SphereSpawner : MonoBehaviour {
 	private Vector3 newCenter = new Vector3 (0, 0, 0);
 	private float speed=25;
 	public bool play = false;
-	private float expDT = 0; 
+	private float expDT = 0;
 	float tau = Mathf.PI * 2;
+	GameObject genesis;
+	Vector3 genesisPos = new Vector3(0,0,0);
+
+	public Texture FBITexture;
+	public Texture PizzaTexture;
+	public Texture DollarTexture;
+
+	int dollarNote = -1;
+	int pizzaBox = -1;
 
 	// Use this for initialization
 	void Start () {
@@ -25,6 +34,8 @@ public class SphereSpawner : MonoBehaviour {
 		dao = new SQLiteDAO(dataPath);
 
 		int i = 0;
+		float tau = Mathf.PI * 2;
+
 
 		if (StartVisualization.exp) {
 			play = true;
@@ -39,33 +50,99 @@ public class SphereSpawner : MonoBehaviour {
 		// TODO: check if ToList makes it better or worse
 		foreach (var address in addresses.ToList())
 		{
-			// init position
-			positions.Add(PolarToCartesian(new Vector3(address.FirstOccurrenceBlockHeight/2, Random.Range(0f, tau), Random.Range(0f, tau))));
+	
+
 
 			// init planet
 			var balance = address.BalanceAfterBlock(numBlocks);
-			float scaleFactor = (float) balance / 50;
+			float scaleFactor = (float) address.Profit / 50;
 			Vector3 scaleVector = new Vector3 (scaleFactor, scaleFactor, scaleFactor);
 
-			GameObject planet = GameObject.CreatePrimitive (PrimitiveType.Sphere);
-			if(StartVisualization.boringcolors){
-				planet.GetComponent<Renderer>().material.color = HSVToRGB (0f, 0f, 50f);
-			}else{
-				planet.GetComponent<Renderer>().material.color = HSVToRGB (Random.Range (0f, 1f), 1f, 1f);
-			}
-			planet.AddComponent<OnClickCenterView>();
-			planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
-			planet.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
-			planet.GetComponent<OnClickCenterView>().setBalance ((float) balance);
+			// Pizza Planet
+			if (address.ID.Equals("1XPTgDRhN8RFnzniWCddobD9iKZatrvH4")|| address.ID.Equals("1L43UKxQdX1MtzAwr9k9JaFwLjrCWYNz2u")) {
+				Debug.Log ("Found Laszlo's Pizza Address");
+				GameObject planet = GameObject.Find ("PizzaBox");
+				GameObject planet2 = GameObject.Find ("PizzaLayoutFront");
+				GameObject planet3 = GameObject.Find ("PizzaLayoutBack");
+				// init position
+				positions.Add(PolarToCartesian(new Vector3(address.FirstOccurrenceBlockHeight/2, Random.Range(0f, tau), Random.Range(0f, tau))));
 
-			planet.transform.localScale = scaleVector;
-			planet.transform.position = (Vector3) positions[i];
-			planets.Add (planet);
-			i++;
+
+				planet.transform.position = (Vector3) positions[i];
+
+				planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
+				planet.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
+				planet.GetComponent<OnClickCenterView>().setBalance ((float) address.BalanceAfterBlock(numBlocks));
+
+				planet2.GetComponent<OnClickCenterView>().setAddress (address.ID);
+				planet2.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
+				planet2.GetComponent<OnClickCenterView>().setBalance ((float) address.BalanceAfterBlock(numBlocks));
+
+				planet3.GetComponent<OnClickCenterView>().setAddress (address.ID);
+				planet3.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
+				planet3.GetComponent<OnClickCenterView>().setBalance ((float) address.BalanceAfterBlock(numBlocks));
+
+				planets.Add (planet);
+			
+				pizzaBox=i;
+
+				i++;
+
+			}
+
+			// Largest Transaction ever
+			else if (address.ID.Equals("1M8s2S5bgAzSSzVTeL7zruvMPLvzSkEAuv")|| address.ID.Equals("1C1ENNWdkPMyhZ7xTEM4Kwq1FTUifZNCRd")) {
+				Debug.Log ("Largest Transaction ever");
+				GameObject planet = GameObject.Find ("Dollar");
+				GameObject planet2 = GameObject.Find("DollarBack");
+				
+				// init position
+				positions.Add(PolarToCartesian(new Vector3(address.FirstOccurrenceBlockHeight/2, Random.Range(0f, tau), Random.Range(0f, tau))));
+			
+				//planet.GetComponent<Renderer>().material.mainTexture = DollarTexture;
+				planet.transform.position = (Vector3) positions[i];
+
+				planet.AddComponent<OnClickCenterView>();
+				planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
+				planet.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
+				planet.GetComponent<OnClickCenterView>().setBalance ((float) address.BalanceAfterBlock(numBlocks));
+
+				planet2.GetComponent<OnClickCenterView>().setAddress (address.ID);
+				planet2.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
+				planet2.GetComponent<OnClickCenterView>().setBalance ((float) address.BalanceAfterBlock(numBlocks));
+
+				planets.Add (planet);
+
+				dollarNote=i;
+
+				i++;
+
+			}
+			else{
+				GameObject planet = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+
+				if(StartVisualization.boringcolors) planet.GetComponent<Renderer>().material.color = Color.grey;
+				else planet.GetComponent<Renderer>().material.color = HSVToRGB (Random.Range (0f, 1f), 1f, 1f);
+				
+				// init position
+				positions.Add(PolarToCartesian(new Vector3(address.FirstOccurrenceBlockHeight/2, Random.Range(0f, tau), Random.Range(0f, tau))));
+				planet.transform.position = (Vector3) positions[i];
+
+				planet.AddComponent<OnClickCenterView>();
+				planet.GetComponent<OnClickCenterView>().setAddress (address.ID);
+				planet.GetComponent<OnClickCenterView>().setBlock (address.FirstOccurrenceBlockHeight);
+				planet.GetComponent<OnClickCenterView>().setBalance ((float) address.BalanceAfterBlock(numBlocks));
+
+				planet.transform.localScale += scaleVector;
+				planets.Add (planet);
+
+				i++;
+			}
 		}
 		numPlanets = i+1;
+
 	}
-		
+
 	// Update is called once per frame
 	void Update () {
 		if (flight) {
@@ -103,7 +180,7 @@ public class SphereSpawner : MonoBehaviour {
 						var balance = address.BalanceAfterBlock (numBlocks);
 						float scaleFactor = (float)balance / 50;
 						Vector3 scaleVector = new Vector3 (scaleFactor, scaleFactor, scaleFactor);
-					
+
 						GameObject planet = GameObject.CreatePrimitive (PrimitiveType.Sphere);
 						if (StartVisualization.boringcolors) {
 							planet.GetComponent<Renderer> ().material.color = HSVToRGB (0f, 0f, 50f);
@@ -114,7 +191,7 @@ public class SphereSpawner : MonoBehaviour {
 						planet.GetComponent<OnClickCenterView> ().setAddress (address.ID);
 						planet.GetComponent<OnClickCenterView> ().setBlock (address.FirstOccurrenceBlockHeight);
 						planet.GetComponent<OnClickCenterView> ().setBalance ((float)balance);
-					
+
 						planet.transform.localScale = scaleVector;
 						planet.transform.position = PolarToCartesian (new Vector3 (address.FirstOccurrenceBlockHeight / 2, Random.Range (0f, tau), Random.Range (0f, tau)));
 						planets.Add (planet);
@@ -124,14 +201,21 @@ public class SphereSpawner : MonoBehaviour {
 				expDT = 0f;
 			}
 		}
+		if (dollarNote >= 0) {
+			planets [dollarNote].transform.Rotate(new Vector3(this.transform.rotation.x+Time.deltaTime*20,this.transform.rotation.y+Time.deltaTime*20,this.transform.rotation.z+Time.deltaTime*20));
+		}
+		if (pizzaBox >= 0) {
+			planets [pizzaBox].transform.Rotate(new Vector3(this.transform.rotation.x+Time.deltaTime*20,this.transform.rotation.y+Time.deltaTime*20,this.transform.rotation.z+Time.deltaTime*20));
+		}
+
 	}
 
 	public Vector3 PolarToCartesian(Vector3 inPolar){
 		float vX = inPolar [0] * Mathf.Sin (inPolar [1]) * Mathf.Cos (inPolar[2]);
 		float vY = inPolar [0] * Mathf.Sin (inPolar [1]) * Mathf.Sin (inPolar[2]);
 		float vZ = inPolar [0] * Mathf.Cos (inPolar [1]);
-		
-		
+
+
 		return new Vector3(vX, vY, vZ);
 	}
 
