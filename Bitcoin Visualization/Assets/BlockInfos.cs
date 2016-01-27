@@ -30,6 +30,7 @@ public class BlockInfos : MonoBehaviour
 		infos = "Block Height: " + Height + "\n Transactions: " + TransactionCount + "\n TimeStamp: " + TimeStamp;
 		_guiOn = true;
 	}
+
 	
 	void OnMouseExit(){
 
@@ -53,6 +54,7 @@ public class BlockInfos : MonoBehaviour
 			}
 			GUI.Box (new Rect (boxX, boxY, 350, 50), infos);
 		}
-	}
+
+    }
 }
 
