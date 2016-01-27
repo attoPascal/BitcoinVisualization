@@ -5,12 +5,14 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class OnClickCenterView : MonoBehaviour {
 
-	private Color startColor;
+	private Color startColor, startColorKinect;
 	private string address;
 	private int block;
 	private float balance;
 	public string infos = "";
-	private bool _guiOn = false;
+	private bool _guiOn = false, _kinectGuiOn = false;
+
+    float x = 0, y = 0;
 
 	private Vector3 targetPosition;
 
@@ -33,7 +35,7 @@ public class OnClickCenterView : MonoBehaviour {
 		return targetPosition;
 	}
 
-	void OnMouseDown(){
+	public void OnMouseDown(){
 		GameObject go = GameObject.Find("Center");
 		SphereSpawner other = go.GetComponent("SphereSpawner") as SphereSpawner;
 		other.CenterView(gameObject.transform.position);
@@ -50,8 +52,27 @@ public class OnClickCenterView : MonoBehaviour {
 		infos = "Address: " + address + "\n Block Height: " + block + "\n Balance: " + balance;
 		_guiOn = true;
 	}
+    public void OnKinectEnter(float x, float y)
+    {
+        this.x = x;
+        this.y = y;
+        startColorKinect = gameObject.GetComponent<Renderer>().material.color;
+        Vector3 hsvColor = RGBToHSV(startColorKinect);
 
-	void OnMouseExit(){
+        float hue = hsvColor.x, sat = hsvColor.y, val = hsvColor.z;
+
+        sat = sat / 2;
+
+        gameObject.GetComponent<Renderer>().material.color = HSVToRGB(hue, sat, val);
+        infos = "Address: " + address + "\n Block Height: " + block + "\n Balance: " + balance;
+        _kinectGuiOn = true;
+    }
+    public void OnKinectExit()
+    {
+        gameObject.GetComponent<Renderer>().material.color = startColorKinect;
+        _kinectGuiOn = false;
+    }
+    void OnMouseExit(){
 		gameObject.GetComponent<Renderer> ().material.color = startColor;
 		_guiOn = false;
 	}
@@ -73,6 +94,27 @@ public class OnClickCenterView : MonoBehaviour {
 			}
 			GUI.Box (new Rect (boxX, boxY, 350, 50), infos);
 		}
+        if (_kinectGuiOn)
+        {
+            float boxX = 0f;
+            float boxY = 0f;
+            if (x + 370 < Screen.width)
+            {
+                boxX = x + 50;
+            }
+            else {
+                boxX = x - 350;
+            }
+            if (Screen.height - y + 50 > Screen.height)
+            {
+                boxY = Screen.height - y - 50;
+            }
+            else {
+                boxY = Screen.height - y;
+            }
+
+            GUI.Box(new Rect(boxX, boxY, 350, 50), infos);
+        }
 	}
 	public Vector3 RGBToHSV(Color rgb){
 		float h, s, v;
