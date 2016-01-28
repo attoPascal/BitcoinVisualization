@@ -9,3 +9,5 @@ The relevant C# source files (`*.cs`) can be found in `Assets` and its subdirect
 ## Download Build Versions
 - Windows: http://homepage.univie.ac.at/a1200595/pae/bitcoin-visualization-win-x86.zip
 - Mac: http://homepage.univie.ac.at/a1200595/pae/bitcoin-visualization-mac-universal.zip
+
+![Screenshot](http://homepage.univie.ac.at/a1200595/pae/screenshot.png "Screenshot")
