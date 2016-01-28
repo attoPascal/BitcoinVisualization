@@ -15,35 +15,35 @@ namespace Bitcoin
 
 		private EntityRef<Address> address = new EntityRef<Address>();
 
-		[Column(IsPrimaryKey = true, Storage = "id", IsDbGenerated = true, AutoSync = AutoSync.OnInsert)]
+		[Column(IsPrimaryKey = true, Storage = "id", IsDbGenerated = true, AutoSync = AutoSync.Never)]
 		public int ID
 		{
 			get { return id; }
 			set { id = value; }
 		}
 
-		[Column(Storage = "addressID")]
+		[Column(Storage = "addressID", UpdateCheck = UpdateCheck.Never)]
 		public string AddressID
 		{
 			get { return addressID; }
 			set { addressID = value; }
 		}
 
-		[Column(Storage = "transactionID")]
+		[Column(Storage = "transactionID", UpdateCheck = UpdateCheck.Never)]
 		public string TransactionID
 		{
 			get { return transactionID; }
 			set { transactionID = value; }
 		}
 
-		[Column(Storage = "blockHeight")]
+		[Column(Storage = "blockHeight", UpdateCheck = UpdateCheck.Never)]
 		public int BlockHeight
 		{
 			get { return blockHeight; }
 			set { blockHeight = value; }
 		}
 
-		[Column(Storage = "value")]
+		[Column(Storage = "value", UpdateCheck = UpdateCheck.Never)]
 		public double Value
 		{
 			get { return value; }
