@@ -19,8 +19,10 @@ public class SphereSpawner : MonoBehaviour {
 	float tau = Mathf.PI * 2;
 	GameObject genesis;
 	Vector3 genesisPos = new Vector3(0,0,0);
+    public GameObject CoinBase;
 
-	public Texture FBITexture;
+
+    public Texture FBITexture;
 	public Texture PizzaTexture;
 	public Texture DollarTexture;
 
@@ -50,7 +52,9 @@ public class SphereSpawner : MonoBehaviour {
         {
             addresses = addresses.OrderBy(a => a.FirstOccurrenceBlockHeight);
         }
-
+        CoinBase = GameObject.Find("Shockwave");
+        CoinBase.AddComponent<OnClickCenterView>();
+        planets.Add(CoinBase);
 		// TODO: check if ToList makes it better or worse
 		foreach (var address in addresses.ToList())
 		{
@@ -163,9 +167,15 @@ public class SphereSpawner : MonoBehaviour {
 				else planet.GetComponent<Renderer>().material.color = HSVToRGB (Random.Range (0f, 1f), 1f, 1f);
 
                 // init position
-                if (play)
+                if (StartVisualization.dataset=="first-1000.sqlite")
                 {
-                    positions.Add(PolarToCartesian(new Vector3(address.FirstOccurrenceBlockHeight/2, Random.Range(0f, tau), Random.Range(0f, tau))));
+                    var height = address.FirstOccurrenceBlockHeight;
+                    positions.Add(PolarToCartesian(new Vector3((height == 0) ? height/2 : height/2 +10, Random.Range(0f, tau), Random.Range(0f, tau))));
+                    if (height == 0)
+                    {
+                        planet.GetComponent<Renderer>().material.color = Color.yellow;
+                    }
+
                     planet.transform.position = (Vector3)positions[i];
 
                     planet.AddComponent<OnClickCenterView>();
